@@ -1,0 +1,172 @@
+﻿pays,iso3,communaute,region,sous_region
+Albania,ALB,2,Europe,Southern Europe
+Algeria,DZA,2,Africa,Northern Africa
+Angola,AGO,1,Africa,Sub-Saharan Africa
+Antigua and Barbuda,ATG,3,Americas,Latin America and the Caribbean
+Argentina,ARG,0,Americas,Latin America and the Caribbean
+Armenia,ARM,1,Asia,Western Asia
+Australia,AUS,0,Oceania,Australia and New Zealand
+Austria,AUT,0,Europe,Western Europe
+Azerbaijan,AZE,2,Asia,Western Asia
+Bahamas,BHS,3,Americas,Latin America and the Caribbean
+Bahrain,BHR,2,Asia,Western Asia
+Bangladesh,BGD,2,Asia,Southern Asia
+Barbados,BRB,3,Americas,Latin America and the Caribbean
+Belarus,BLR,0,Europe,Eastern Europe
+Belgium,BEL,0,Europe,Western Europe
+Belize,BLZ,1,Americas,Latin America and the Caribbean
+Benin,BEN,1,Africa,Sub-Saharan Africa
+Bhutan,BTN,3,Asia,Southern Asia
+Bolivia,BOL,0,Americas,Latin America and the Caribbean
+Bosnia and Herzegovina,BIH,0,Europe,Southern Europe
+Brazil,BRA,0,Americas,Latin America and the Caribbean
+Brunei Darussalam,BRN,1,Asia,South-eastern Asia
+Bulgaria,BGR,2,Europe,Eastern Europe
+Burkina Faso,BFA,1,Africa,Sub-Saharan Africa
+Burundi,BDI,0,Africa,Sub-Saharan Africa
+Cambodia,KHM,4,Asia,South-eastern Asia
+Cameroon,CMR,1,Africa,Sub-Saharan Africa
+Canada,CAN,0,Americas,Northern America
+Cape Verde,CPV,0,Africa,Sub-Saharan Africa
+Central African Republic,CAF,1,Africa,Sub-Saharan Africa
+Chad,TCD,1,Africa,Sub-Saharan Africa
+Chile,CHL,0,Americas,Latin America and the Caribbean
+China,CHN,4,Asia,Eastern Asia
+Colombia,COL,1,Americas,Latin America and the Caribbean
+Comoros,COM,5,Africa,Sub-Saharan Africa
+Costa Rica,CRI,1,Americas,Latin America and the Caribbean
+Croatia,HRV,0,Europe,Southern Europe
+Cuba,CUB,1,Americas,Latin America and the Caribbean
+Cyprus,CYP,2,Asia,Western Asia
+Czech Republic,CZE,0,Europe,Eastern Europe
+Côte d'Ivoire,CIV,1,Africa,Sub-Saharan Africa
+Democratic Republic of the Congo,ZAR,0,Africa,Sub-Saharan Africa
+Denmark,DNK,0,Europe,Northern Europe
+Djibouti,DJI,2,Africa,Sub-Saharan Africa
+Dominica,DMA,3,Americas,Latin America and the Caribbean
+Dominican Republic,DOM,1,Americas,Latin America and the Caribbean
+Ecuador,ECU,3,Americas,Latin America and the Caribbean
+Egypt,EGY,2,Africa,Northern Africa
+El Salvador,SLV,3,Americas,Latin America and the Caribbean
+Equatorial Guinea,GNQ,1,Africa,Sub-Saharan Africa
+Estonia,EST,0,Europe,Northern Europe
+Ethiopia,ETH,3,Africa,Sub-Saharan Africa
+Fiji,FJI,3,Oceania,Melanesia
+Finland,FIN,0,Europe,Northern Europe
+France,FRA,0,Europe,Western Europe
+Gabon,GAB,1,Africa,Sub-Saharan Africa
+Gambia,GMB,1,Africa,Sub-Saharan Africa
+Georgia,GEO,0,Asia,Western Asia
+Germany,DEU,0,Europe,Western Europe
+Ghana,GHA,1,Africa,Sub-Saharan Africa
+Greece,GRC,0,Europe,Southern Europe
+Greenland,GRL,0,Americas,Northern America
+Grenada,GRD,8,Americas,Latin America and the Caribbean
+Guatemala,GTM,1,Americas,Latin America and the Caribbean
+Guinea,GIN,1,Africa,Sub-Saharan Africa
+Guinea-Bissau,GNB,1,Africa,Sub-Saharan Africa
+Guyana,GUY,3,Americas,Latin America and the Caribbean
+Haiti,HTI,1,Americas,Latin America and the Caribbean
+Honduras,HND,1,Americas,Latin America and the Caribbean
+Hong Kong (SARC),HKG,4,Asia,Eastern Asia
+Hungary,HUN,0,Europe,Eastern Europe
+Iceland,ISL,0,Europe,Northern Europe
+India,IND,2,Asia,Southern Asia
+Indonesia,IDN,1,Asia,South-eastern Asia
+Iran (Islamic Republic of),IRN,2,Asia,Southern Asia
+Ireland,IRL,0,Europe,Northern Europe
+Israel,ISR,2,Asia,Western Asia
+Italy,ITA,0,Europe,Southern Europe
+Jamaica,JAM,3,Americas,Latin America and the Caribbean
+Japan,JPN,4,Asia,Eastern Asia
+Jordan,JOR,9,Asia,Western Asia
+Kazakstan,KAZ,0,Asia,Central Asia
+Kenya,KEN,2,Africa,Sub-Saharan Africa
+Kiribati,KIR,5,Oceania,Micronesia
+"Korea, Rep. of Korea",KOR,4,Asia,Eastern Asia
+Kuwait,KWT,2,Asia,Western Asia
+Kyrgyzstan,KGZ,2,Asia,Central Asia
+Lao People's Democratic Republic,LAO,4,Asia,South-eastern Asia
+Latvia,LVA,0,Europe,Northern Europe
+Lebanon,LBN,2,Asia,Western Asia
+Liberia,LBR,1,Africa,Sub-Saharan Africa
+Lithuania,LTU,0,Europe,Northern Europe
+Macau,MAC,0,Asia,Eastern Asia
+"Macedonia, FYR",MKD,1,Europe,Southern Europe
+Madagascar,MDG,1,Africa,Sub-Saharan Africa
+Malawi,MWI,3,Africa,Sub-Saharan Africa
+Malaysia,MYS,3,Asia,South-eastern Asia
+Maldives,MDV,3,Asia,Southern Asia
+Mali,MLI,1,Africa,Sub-Saharan Africa
+Malta,MLT,0,Europe,Southern Europe
+Marshall Islands,MHL,10,Oceania,Micronesia
+Mauritania,MRT,2,Africa,Sub-Saharan Africa
+Mauritius,MUS,1,Africa,Sub-Saharan Africa
+Mexico,MEX,2,Americas,Latin America and the Caribbean
+Micronesia (Federated States of),FSM,6,Oceania,Micronesia
+"Moldova, Rep.of",MDA,0,Europe,Eastern Europe
+Mongolia,MNG,3,Asia,Eastern Asia
+Morocco,MAR,2,Africa,Northern Africa
+Mozambique,MOZ,1,Africa,Sub-Saharan Africa
+Nepal,NPL,2,Asia,Southern Asia
+Netherlands,NLD,0,Europe,Western Europe
+New Zealand,NZL,0,Oceania,Australia and New Zealand
+Nicaragua,NIC,1,Americas,Latin America and the Caribbean
+Niger,NER,1,Africa,Sub-Saharan Africa
+Nigeria,NGA,1,Africa,Sub-Saharan Africa
+Norway,NOR,0,Europe,Northern Europe
+Oman,OMN,2,Asia,Western Asia
+Pakistan,PAK,2,Asia,Southern Asia
+Palau,PLW,6,Oceania,Micronesia
+Panama,PAN,1,Americas,Latin America and the Caribbean
+Paraguay,PRY,0,Americas,Latin America and the Caribbean
+Peru,PER,3,Americas,Latin America and the Caribbean
+Philippines,PHL,1,Asia,South-eastern Asia
+Poland,POL,0,Europe,Eastern Europe
+Portugal,PRT,0,Europe,Southern Europe
+Qatar,QAT,2,Asia,Western Asia
+Republic of the Congo,COG,1,Africa,Sub-Saharan Africa
+Roumania,ROM,1,Europe,Eastern Europe
+Russian Federation,RUS,0,Europe,Eastern Europe
+Rwanda,RWA,1,Africa,Sub-Saharan Africa
+Saint Kitts and Nevis,KNA,3,Americas,Latin America and the Caribbean
+Saint Lucia,LCA,3,Americas,Latin America and the Caribbean
+Saint Vincent and the Grenadines,VCT,3,Americas,Latin America and the Caribbean
+Samoa,WSM,5,Oceania,Polynesia
+Saudi Arabia,SAU,2,Asia,Western Asia
+Senegal,SEN,1,Africa,Sub-Saharan Africa
+Seychelles,SYC,6,Africa,Sub-Saharan Africa
+Sierra Leone,SLE,1,Africa,Sub-Saharan Africa
+Singapore,SGP,4,Asia,South-eastern Asia
+Slovakia,SVK,0,Europe,Eastern Europe
+Slovenia,SVN,0,Europe,Southern Europe
+Solomon Islands,SLB,5,Oceania,Melanesia
+South Africa,ZAF,0,Africa,Sub-Saharan Africa
+Spain,ESP,1,Europe,Southern Europe
+Sri Lanka,LKA,3,Asia,Southern Asia
+Sudan,SDN,2,Africa,Northern Africa
+Suriname,SUR,1,Americas,Latin America and the Caribbean
+Sweden,SWE,0,Europe,Northern Europe
+Switzerland,CHE,0,Europe,Western Europe
+Tajikistan,TJK,2,Asia,Central Asia
+"Tanzania, United Rep. of",TZA,3,Africa,Sub-Saharan Africa
+Thailand,THA,4,Asia,South-eastern Asia
+Togo,TGO,3,Africa,Sub-Saharan Africa
+Tonga,TON,5,Oceania,Polynesia
+Trinidad and Tobago,TTO,3,Americas,Latin America and the Caribbean
+Tunisia,TUN,2,Africa,Northern Africa
+Turkey,TUR,2,Asia,Western Asia
+Turkmenistan,TKM,2,Asia,Central Asia
+Tuvalu,TUV,3,Oceania,Polynesia
+Uganda,UGA,3,Africa,Sub-Saharan Africa
+Ukraine,UKR,0,Europe,Eastern Europe
+United Arab Emirates,ARE,2,Asia,Western Asia
+United Kingdom,GBR,0,Europe,Northern Europe
+United States of America,USA,0,Americas,Northern America
+Uruguay,URY,0,Americas,Latin America and the Caribbean
+Uzbekistan,UZB,2,Asia,Central Asia
+Vanuatu,VUT,5,Oceania,Melanesia
+Viet Nam,VNM,4,Asia,South-eastern Asia
+Yemen,YEM,2,Asia,Western Asia
+Zambia,ZMB,7,Africa,Sub-Saharan Africa
+Zimbabwe,ZWE,7,Africa,Sub-Saharan Africa
