@@ -1,0 +1,112 @@
+% Written report -- Graph Analytics 2026, Albert School.
+% Built on the official template (written-report-template.tex): same class,
+% packages, section headings and bibliography style. Added only graphicx,
+% booktabs and amsmath for figures, tables and the PMI formula.
+%
+% Skeleton only. Each section and subsection lives in its own file in sections/,
+% with one owner per file, so the two branches never edit the same file.
+% The %% comments in each file say who writes it, the page
+% budget (target 13-14 pages, hard limit 15) and what it must contain, taken
+% from the roadmap (https://claude.ai/artifact/6EdHNyEmH9VhYdEhCWCNQa).
+% Delete each \guidance{...} line and the %% comments once the section is written.
+%
+% Owners: A = Khadidja Addi, B = second author.
+% Build: pdflatex main && bibtex main && pdflatex main && pdflatex main
+%        (or upload this folder and ../outputs/*.png to Overleaf).
+
+\documentclass[10pt,a4paper]{article}
+\usepackage{sectsty}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\sectionfont{\raggedright}
+\graphicspath{{../outputs/}}
+
+\newcommand{\guidance}[1]{\par\smallskip\noindent\textit{#1}\par\smallskip}
+
+% TODO (both): final title. Avoid "bridges": in the course a bridge is a cut edge.
+\title{Communities and Brokers in Ingredient Networks of World Cuisines}
+\author{
+  Khadidja Addi\\
+  \texttt{[Author 1 email]}%
+  \and
+  [Author 2 full name]\\
+  \texttt{[Author 2 email]}
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+% ============================================================================
+\section{Introduction}
+\input{sections/introduction}
+
+% ============================================================================
+\section{Dataset Presentation}
+\input{sections/dataset}
+
+\subsection{Sources}
+\input{sections/dataset-sources}
+
+\subsection{Ingredient graph}
+\input{sections/dataset-ingredient-graph}
+
+\subsection{Country graph}
+\input{sections/dataset-country-graph}
+
+\subsection{Graph statistics}
+\input{sections/dataset-graph-statistics}
+
+% ============================================================================
+\section{Description of the Analysis}
+\input{sections/analysis}
+
+\subsection{Software}
+\input{sections/analysis-software}
+
+\subsection{Connectivity and distances}
+\input{sections/analysis-connectivity-and-distances}
+
+\subsection{Centrality}
+\input{sections/analysis-centrality}
+
+\subsection{Communities}
+\input{sections/analysis-communities}
+
+\subsection{Sensitivity}
+\input{sections/analysis-sensitivity}
+
+\subsection{Reused code and use of AI}
+\input{sections/analysis-reused-code-and-use-of-ai}
+
+% ============================================================================
+\section{Results}
+\input{sections/results}
+
+\subsection{Ingredient communities}
+\input{sections/results-ingredient-communities}
+
+\subsection{Brokers: betweenness versus frequency}
+\input{sections/results-brokers-betweenness-versus-frequency}
+
+\subsection{Countries and geography}
+\input{sections/results-countries-and-geography}
+
+\subsection{Sensitivity to thresholds}
+\input{sections/results-sensitivity-to-thresholds}
+
+% ============================================================================
+\section{Conclusions}
+\input{sections/conclusions}
+
+\guidance{Add references to \texttt{biblio.bib} and cite them in the text using \texttt{\textbackslash cite\{key\}}. Include sources for data, software, methods, and reused code.}
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+\end{document}

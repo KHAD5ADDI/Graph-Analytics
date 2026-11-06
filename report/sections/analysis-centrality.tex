@@ -1,0 +1,11 @@
+% Owner: B
+%% Owner: B.
+%% - Degree (raw count; say so) and strength (sum of PMI weights).
+%% - Hop betweenness = primary broker measure. NetworkX normalises it by default.
+%% - Betweenness with distance 1/PMI = sensitivity comparison; justify as
+%%   "stronger association means a shorter step", not by "weights are non-negative".
+%% - Eigenvector centrality on the largest component (our convention; it needs a
+%%   connected graph).
+%% - Spearman correlation of each centrality with ingredient frequency, read
+%%   descriptively (frequency comes from the same recipes).
+%% - Optional, country graph only: Wasserman-Faust closeness \cite{wasserman1994}.
