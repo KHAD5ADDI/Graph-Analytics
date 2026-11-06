@@ -40,6 +40,8 @@ Group project, Graph Analytics course, Albert School, 2026
 >    python robustness.py     # removal experiments on the ingredient graph
 >    python geography.py      # communities vs UN regions, similarity vs distance
 >    python visualize.py      # network figures (needs the output of geography.py)
+>    python fig_mesures.py    # centrality top-10 and degree distribution figures
+>    python interactive.py    # interactive explorer -> outputs/graphes_interactifs.html
 >    ```
 >
 > 4. Tables (CSV) and figures (PNG) are written to `outputs/`. All thresholds are parameters at the top of `src/build_graphs.py`.
@@ -317,7 +319,10 @@ Removal experiments (robustness)        NMI / ARI, Spearman, OLS
 │   ├── analyze.py                    # required measures, Louvain, participation, sensitivity
 │   ├── robustness.py                 # removal experiments on the ingredient graph
 │   ├── geography.py                  # communities vs UN regions, similarity vs distance, validation
-│   └── visualize.py                  # network figures
+│   ├── visualize.py                  # network figures
+│   ├── fig_mesures.py                # centrality and degree figures
+│   ├── interactive.py                # interactive explorer (HTML, opens in any browser)
+│   └── interactive_template.html     # page template used by interactive.py
 └── outputs/
     ├── ingredients_nodes.csv         # node table (centralities, community, participation)
     ├── countries_nodes.csv
@@ -349,6 +354,8 @@ Prerequisites: Python 3.12 (the version used for all results) and `pip`. No GPU 
    python robustness.py
    python geography.py
    python visualize.py
+   python fig_mesures.py
+   python interactive.py
    ```
 
    `analyze.py` takes about 2 minutes (the sensitivity analysis rebuilds the graph for each threshold). On Windows, set `PYTHONIOENCODING=utf-8` if the console fails on accented country names.
