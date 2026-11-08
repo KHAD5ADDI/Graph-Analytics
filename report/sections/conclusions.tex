@@ -1,6 +1,45 @@
 % Owner: B
-%% Owner: B drafts, both approve. Budget: 1 page.
-\guidance{Summarize the main findings and note relevant limitations or possible future work.}
-%% Direct answer to the central question. Limitations: sampled recipes, US/Italy
-%% imbalance, small country profiles, seed dependence, one distance choice for
-%% weighted betweenness. Future work in 2-3 lines.
+We find communities in both graphs, but the connecting ingredients we
+identify depend on the distance used for betweenness. The ingredient
+graph has $362$ nodes and $10{,}853$ edges in one connected component.
+Louvain gives five communities of $112$, $97$, $57$, $55$ and $41$
+ingredients, with modularity $0.400$. Water, Salt and Butter lead hop
+betweenness. Across all ingredients, hop betweenness closely follows
+frequency, with Spearman correlation $\rho=0.968$. With $1/\mathrm{PMI}$
+distances, Couscous, Lasagna and Shallot lead instead, and the correlation
+with frequency is $\rho=0.323$. Common ingredients are the brokers when
+every edge counts as one step, while strongly associated but less
+frequent ingredients become brokers when stronger association means a
+shorter step. The graph has no
+articulation point or bridge, so removing a single ingredient or edge
+does not split it.
+
+For countries, we find a partial agreement between communities and UN
+regions. The graph has $171$ nodes and $2{,}066$ edges in five components,
+with $166$ countries in the largest. Louvain gives $11$ communities and
+modularity $0.286$. An all-Asian community and a mostly Oceanian community
+form clear regional blocks. The large communities also mix Europe with
+the Americas and Africa with the Americas. We measure agreement as the
+share of countries whose region is the most frequent in their community.
+This share is $64.3\%$, compared with a mean of $34.0\%$ over $1{,}000$
+shuffles ($p\approx0.001$). The regional comparison gives evidence of an
+association between ingredient similarity and UN regions. The mixed
+communities show that these labels do not describe the whole partition.
+
+Modularity rises with stricter thresholds partly because the graphs split
+into more components, so it cannot choose the thresholds on its own.
+Our data and methods limit these findings. CulinaryDB is a sample of
+recipes with an imbalance towards US and Italian cuisines, so it does
+not represent cuisines evenly. Country profiles are small, and a few
+ingredients decide whether an edge passes the Jaccard threshold. Louvain
+depends on the random seed, so the reported partition is one of several
+possible results \textbf{TODO: cite the 30-seed stability result from the communities section}.
+For weighted betweenness, we use only $1/\mathrm{PMI}$
+as a distance choice; another conversion could give different rankings.
+The shuffle test treats countries as exchangeable when it permutes
+region labels. This assumption does not account for dependence between
+neighbouring countries.
+
+Future work could use a more balanced recipe sample and fuller country profiles.
+We could compare Louvain seeds and distance choices, and use shuffles that
+preserve some regional dependence.

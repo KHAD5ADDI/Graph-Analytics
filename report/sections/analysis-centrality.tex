@@ -1,11 +1,26 @@
 % Owner: B
-%% Owner: B.
-%% - Degree (raw count; say so) and strength (sum of PMI weights).
-%% - Hop betweenness = primary broker measure. NetworkX normalises it by default.
-%% - Betweenness with distance 1/PMI = sensitivity comparison; justify as
-%%   "stronger association means a shorter step", not by "weights are non-negative".
-%% - Eigenvector centrality on the largest component (our convention; it needs a
-%%   connected graph).
-%% - Spearman correlation of each centrality with ingredient frequency, read
-%%   descriptively (frequency comes from the same recipes).
-%% - Optional, country graph only: Wasserman-Faust closeness \cite{wasserman1994}.
+We use the course definitions of centrality \cite{quercini2026}. For an
+ingredient, degree is its number of neighbours. We report this as a raw
+count. Strength is the sum of the pointwise mutual information (PMI) weights
+of its incident edges. PMI measures association relative to independent
+occurrence, so strength summarises these associations over the retained
+neighbours.
+
+Betweenness sums, over pairs of other nodes, the share of their shortest
+paths that pass through the node considered. Our primary measure of brokers,
+meaning ingredients that lie on many shortest paths, is hop betweenness.
+We count shortest paths in hops and use NetworkX's default normalisation.
+This choice gives every retained edge the same length, regardless of its
+PMI weight.
+
+As a sensitivity comparison, we also compute betweenness with edge distance
+$1/\mathrm{PMI}$. We choose this convention because a stronger association
+means a shorter step. It changes which paths are shortest, so the broker
+ranking depends on how we interpret edge length. We keep hop betweenness as
+the primary measure.
+
+To compare degree and both betweenness measures with ingredient frequency,
+the number of recipes containing the ingredient, we use Spearman
+correlation, which compares ranks. We read these correlations descriptively
+because frequency comes from the same recipes as the graph. They do not
+establish a causal relationship.

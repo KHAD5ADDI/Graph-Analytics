@@ -1,4 +1,42 @@
 % Owner: B
-%% Owner: B. Short table from outputs/sensibilite_*.csv; modularity 0.400 ->
-%% 0.423 while the graph stays connected, so higher modularity is not only
-%% fragmentation.
+Table~\ref{tab:sensitivity} compares thresholds around our chosen settings.
+We keep the country profile set to \texttt{all}, using the union of
+ingredients from all dishes for each country.
+
+\begin{table}[h]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}l r r r r r@{}}
+\toprule
+Setting & Edges & Components & Largest & Communities & Modularity \\
+\midrule
+\multicolumn{6}{l}{Ingredients: minimum co-occurrence / PMI threshold} \\
+\textbf{10 / 0.0} & 10{,}853 & 1 & 362 & 5 & 0.400 \\
+10 / 0.5 & 7{,}745 & 1 & 362 & 5 & 0.423 \\
+10 / 1.0 & 4{,}910 & 2 & 361 & 7 & 0.477 \\
+20 / 0.0 & 7{,}873 & 3 & 360 & 8 & 0.414 \\
+\midrule
+\multicolumn{6}{l}{Countries: Jaccard threshold, profile \texttt{all}} \\
+0.25 & 4{,}466 & 3 & 169 & 7 & 0.183 \\
+\textbf{0.30} & 2{,}066 & 5 & 166 & 11 & 0.286 \\
+0.35 & 835 & 17 & 153 & 23 & 0.437 \\
+\bottomrule
+\end{tabular}
+\caption{Threshold comparisons, with our chosen settings in bold.
+Largest gives the number of nodes in the largest connected component;
+communities are found with Louvain. Modularity values describe different
+graphs and must be read alongside their components.}
+\label{tab:sensitivity}
+\end{table}
+
+At minimum co-occurrence $10$, increasing the PMI threshold from $0.0$ to
+$0.5$ raises modularity from $0.400$ to $0.423$. The graph stays in one
+connected component, so higher modularity here is not only a result of
+splitting into components. Stricter settings also split the graph into
+several components, which raises modularity on its own.
+
+For countries, raising the Jaccard threshold from $0.25$ to $0.35$ raises
+modularity from $0.183$ to $0.437$, but the number of components also grows
+from $3$ to $17$. Part of that gain comes from the graph falling apart,
+which is why we keep $0.30$.

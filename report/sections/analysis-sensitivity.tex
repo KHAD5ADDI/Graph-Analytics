@@ -1,4 +1,36 @@
 % Owner: B
-%% Owner: B. A few rows of the threshold sweeps (min co-occurrence x PMI
-%% threshold; Jaccard threshold). Choice = compromise that keeps the graph
-%% connected while showing structure (not "best trade-off").
+We rebuild both graphs over a grid of thresholds. For ingredients, we cross
+minimum co-occurrence counts of $5$, $10$, $20$ and $50$ recipes with PMI
+thresholds of $0.0$, $0.5$ and $1.0$. For countries, we test Jaccard thresholds
+of $0.15$, $0.2$, $0.25$, $0.3$, $0.35$, $0.4$ and $0.5$. Jaccard similarity
+is the share of ingredients in the union of the country profiles that they
+share. We track connected components, average clustering, the number of
+Louvain communities and modularity. Clustering measures how often a node's
+neighbours are also neighbours of each other. Louvain groups nodes into
+communities by seeking higher modularity \cite{blondel2008}. Modularity
+compares the weight within communities with that expected from node
+strengths. We choose minimum co-occurrence $10$, PMI threshold $0.0$ and
+Jaccard threshold $0.30$ as a compromise: the ingredient graph stays
+connected and the country graph mostly connected, while both show community
+structure. These choices depend on the tested grid. We present the
+comparisons in the Results subsection ``Sensitivity to thresholds''.
+
+\paragraph{Shuffle test.}
+If country communities had nothing to do with geography, randomly
+reshuffling the United Nations (UN) region labels would match them about as
+well as the real labels do. Modularity measures how well communities divide
+the graph; it does not measure agreement with an outside label. We define
+agreement as the share of countries whose UN region is their community's
+most frequent region. We use the UN region labels from the regional code
+table \cite{unregions}. We keep the Louvain communities fixed, using seed
+$42$, and permute the region labels of the $171$ countries $1{,}000$ times.
+We recalculate each community's most frequent region after each shuffle.
+With $A_{\mathrm{obs}}$ the observed agreement and $A_b$ the agreement after
+shuffle $b$, we calculate
+\[
+p = \frac{1 + \#\{b : A_b \geq A_{\mathrm{obs}}\}}{1 + 1{,}000}.
+\]
+Here $\#$ counts shuffles meeting the condition. We treat region labels as
+exchangeable, meaning that any assignment preserving the region counts is
+allowed. Neighbouring countries are not independent, which limits this
+assumption. A match shows association, not cause.
