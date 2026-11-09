@@ -30,16 +30,16 @@ Group project, Graph Analytics course, Albert School, 2026
 > [!TIP]
 > **Reproduce the whole analysis**
 >
-> 1. Install the dependencies: `pip install -r requirements.txt`
+> 1. Install the dependencies with [uv](https://docs.astral.sh/uv/): `uv sync`
 > 2. Move to the source folder: `cd src`
 > 3. Run the pipeline in this order:
 >
 >    ```bash
->    python build_graphs.py   # cleaning + both graphs -> data/processed/
->    python analyze.py        # measures, Louvain, sensitivity (about 2 min)
->    python robustness.py     # removal experiments on the ingredient graph
->    python geography.py      # communities vs UN regions, similarity vs distance
->    python visualize.py      # network figures (needs the output of geography.py)
+>    uv run python build_graphs.py   # cleaning + both graphs -> data/processed/
+>    uv run python analyze.py        # measures, Louvain, sensitivity (about 2 min)
+>    uv run python robustness.py     # removal experiments on the ingredient graph
+>    uv run python geography.py      # communities vs UN regions, similarity vs distance
+>    uv run python visualize.py      # network figures (needs the output of geography.py)
 >    ```
 >
 > 4. Tables (CSV) and figures (PNG) are written to `outputs/`. All thresholds are parameters at the top of `src/build_graphs.py`.
@@ -345,7 +345,9 @@ Removal experiments (repository only)
 ```text
 .
 ├── README.md
-├── requirements.txt
+├── pyproject.toml                    # project metadata and dependencies (uv)
+├── uv.lock                           # exact locked versions
+├── .python-version                   # Python 3.12
 ├── data/
 │   ├── raw/
 │   │   ├── culinarydb/               # 4 CSV files (+ original zip)
@@ -377,13 +379,15 @@ Removal experiments (repository only)
 
 ## Installation and setup
 
-Prerequisites: Python 3.12 (the version used for all results) and `pip`. No GPU or API key is needed.
+Prerequisites: [uv](https://docs.astral.sh/uv/getting-started/installation/). uv installs Python 3.12 (the version used for all results) by itself if it is missing. No GPU or API key is needed.
 
-1. Install the dependencies:
+1. Create the virtual environment and install the locked dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   uv sync
    ```
+
+   `uv.lock` pins the exact library versions used for the results below. If you need a pip-style file, run `uv export --no-hashes -o requirements.txt`.
 
 2. Check that the raw data are in `data/raw/` (they are versioned in this repository). If not, download them from the links in [Data sources and versions](#data-sources-and-versions).
 
@@ -391,11 +395,11 @@ Prerequisites: Python 3.12 (the version used for all results) and `pip`. No GPU 
 
    ```bash
    cd src
-   python build_graphs.py
-   python analyze.py
-   python robustness.py
-   python geography.py
-   python visualize.py
+   uv run python build_graphs.py
+   uv run python analyze.py
+   uv run python robustness.py
+   uv run python geography.py
+   uv run python visualize.py
    ```
 
    `analyze.py` takes about 2 minutes (the sensitivity analysis rebuilds the graph for each threshold). On Windows, set `PYTHONIOENCODING=utf-8` if the console fails on accented country names. `seed_stability.py` and `pmi_justification.py` each take under a minute; `fig_mesures.py` and `interactive.py` are optional extras (see [section 7](#7-extra-analyses-and-visualisations)).
