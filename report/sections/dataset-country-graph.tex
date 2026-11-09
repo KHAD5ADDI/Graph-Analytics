@@ -1,6 +1,17 @@
 % Owner: A
-%% - Nodes: 171 country/territory labels. Profile: union of ingredients over all
-%%   of a country's dishes (national dish only tested as an alternative).
-%% - Edges: Jaccard similarity >= 0.30 (Jaccard is used in the course Neo4j lab).
-%% - Undirected, simple, weighted. Median profile 16 ingredients; 20 countries
-%%   have 8 or fewer, which makes similarities coarse.
+Each of the 171 countries and territories is a node. The profile of a country
+is the set of ingredients that appear in at least one of its dishes, that is,
+the union over all its dishes. For two countries with profiles $A$ and $B$,
+the weight is the Jaccard similarity, which the course also uses in its
+lab~\cite{quercini2026}:
+\begin{equation*}
+  J(A,B) = \frac{|A \cap B|}{|A \cup B|},
+\end{equation*}
+the share of the ingredients of the union that both countries use. We keep an
+edge when $J \geq 0.30$, which gives 2{,}066 edges. We also tried a profile
+made of the national dish alone. It has about ten ingredients per country, so
+the similarities are too coarse, and we keep all the dishes. Profiles remain
+small: the median profile has 16 ingredients, and 20 countries have 8 or
+fewer. One ingredient can therefore decide whether an edge passes the
+threshold. We discuss the choice of the threshold with the sensitivity
+analysis.

@@ -1,10 +1,76 @@
 % Owner: A
-%% Owner: A. 5 communities, modularity 0.400 (seed 42); 4-6 communities and
-%% modularity 0.389-0.402 across 30 seeds. Describe each community by its
-%% ingredients; cuisine names are interpretations only. One consistent
-%% community numbering everywhere (sorted by size).
-% \begin{figure}[h]
-%   \centering
-%   \includegraphics[width=\linewidth]{fig_ingredients.png}
-%   \caption{TODO (English labels after the Friday fix).}
-% \end{figure}
+Louvain finds five communities in the ingredient graph (modularity $0.400$
+with seed 42). Table~\ref{tab:communities} lists the ingredients with the
+highest strength in each community, and Figure~\ref{fig:ingredients} shows
+the graph. Community 0 (112 ingredients) contains vegetables, herbs and
+mushrooms; community 1 (97) sweet and baking ingredients; community 2 (57)
+salad, sauce and condiment ingredients together with beef and pork; community 3
+(55) ginger, soy sauce, fish, lime and coconut milk; and community 4 (41)
+spices and legumes. These descriptions summarise the listed ingredients. We did
+not compare the communities with the cuisine labels, so we do not call them
+cuisines.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}r r p{0.72\linewidth}@{}}
+\toprule
+Community & Size & Strongest ingredients \\
+\midrule
+0 & 112 & Shallot, Laurel, Carrot, Celery, Thyme, Fennel, Parsley, Mushroom \\
+1 & 97 & Cinnamon, Vanilla, Coconut, Orange, Nutmeg, Raisin, Sugar, Honey \\
+2 & 57 & Lettuce, Mustard, Beans, Mayonnaise, Onion, Beef, Pork \\
+3 & 55 & Ginger, Welsh onion, Shrimp, Fish, Soybean Sauce, Lime, Sesame, Coconut Milk \\
+4 & 41 & Coriander, Turmeric, Clove, Cumin, Chickpea, Cayenne, Peas, Capsicum \\
+\bottomrule
+\end{tabular}
+\caption{Ingredient communities (Louvain, seed 42). The strongest ingredients
+have the largest strength, that is, the largest sum of PMI weights. The table
+lists ingredients; it does not name cuisines.}
+\label{tab:communities}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{fig_ingredients.png}
+\caption{Ingredient graph. Colour shows the Louvain community (seed 42).
+Black rings mark the ten ingredients with the highest hop betweenness, which
+the next subsection compares with frequency. Only the strongest edges of each
+node are drawn (1{,}527 of 10{,}853); node positions come from a force-directed
+layout and have no meaning of their own.}
+\label{fig:ingredients}
+\end{figure}
+
+\paragraph{Stability over seeds.}
+Over 30 seeds, the number of communities ranges from 4 to 6 and equals 5 in 28
+runs. The modularity ranges from $0.389$ to $0.402$, and it is $0.400$ for
+seed 42. Ingredients that share a community in at least 27 of the 30 runs form
+13 groups, which cover 349 of the 362 ingredients; the five largest groups
+have 109, 95, 44, 43 and 39 ingredients. Table~\ref{tab:stability} shows how
+much of each seed-42 community lies in such a group. Communities 1 and 4 are
+almost entirely stable, while community 2 is the least stable, with 39 of its
+57 ingredients in a stable group. For the country graph, the number of
+communities ranges from 9 to 11 (11 in 21 runs) and the modularity from $0.271$
+to $0.288$; 14 groups cover 154 of the 171 countries. Stability over seeds shows
+that the partition is not an accident of one seed. It does not show that no
+better partition exists, because Louvain is a heuristic.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}r r r@{}}
+\toprule
+Community (seed 42) & Size & Ingredients in its stable group \\
+\midrule
+0 & 112 & 102 \\
+1 & 97 & 95 \\
+2 & 57 & 39 \\
+3 & 55 & 44 \\
+4 & 41 & 40 \\
+\bottomrule
+\end{tabular}
+\caption{For each seed-42 community, the number of its ingredients that belong
+to the matching group of ingredients sharing a community in at least 27 of 30
+Louvain runs.}
+\label{tab:stability}
+\end{table}

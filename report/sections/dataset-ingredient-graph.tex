@@ -1,17 +1,53 @@
 % Owner: A
-%% - Start from the recipe-ingredient bipartite graph; project it onto
-%%   ingredients, as in the course \cite{quercini2026}. The course weights the
-%%   projection by the number of common neighbours (shared recipes). We then
-%%   filter and replace that count with PMI. Do NOT call the PMI graph the
-%%   taught projection.
-%% - Nodes: ingredients in >= 50 recipes (362). Edges: >= 10 shared recipes AND
-%%   PMI > 0. Weight: PMI \cite{church1990}, formula below.
-%% - Justification of PMI (from the roadmap): counts say which pairs are common,
-%%   PMI says which pairs are more common than chance. Salt-Garlic 7,571 together
-%%   vs 6,554 expected (ratio 1.16); Ginger-Soy sauce 1,010 vs 226 (ratio 4.46).
-%%   Do not argue from modularity across the two weightings.
-%% - Undirected (co-occurrence is symmetric), simple (one weighted edge per pair).
+We start from the bipartite graph that links each recipe to its ingredients
+and project it onto the ingredients, as in the course~\cite{quercini2026}. In
+the course projection, two ingredients are linked with a weight equal to
+their number of common neighbours, here the number of recipes that contain
+both. We change this projection in three ways. We keep only the ingredients
+that occur in at least 50 recipes (362 of 695). We keep only the pairs that
+share at least 10 recipes. We replace the number of shared recipes by the PMI
+of the pair~\cite{church1990} and drop the pairs with PMI $\leq 0$. The result
+has 362 nodes and 10{,}853 edges. It is a filtered, PMI-weighted variant of
+the taught projection, not the taught projection itself, and PMI is an
+extension that the course does not cover. The PMI of two ingredients $i$ and
+$j$ is
 \begin{equation*}
-  \mathrm{PMI}(i,j) = \log_2 \frac{c_{ij}\, N}{c_i\, c_j}
+  \mathrm{PMI}(i,j) = \log_2 \frac{c_{ij}\, N}{c_i\, c_j},
 \end{equation*}
-%% c_ij = recipes containing both, c_i = recipes containing i, N = 45,749.
+where $c_{ij}$ is the number of recipes that contain both ingredients, $c_i$
+and $c_j$ are the numbers of recipes that contain each of them, and
+$N=45{,}749$ is the number of recipes with at least one ingredient. The
+ratio compares how often the pair occurs with how often it would occur if the
+two ingredients were independent. A positive PMI means that the pair is more
+common than that; it is not a significance test. PMI tends to favour rare
+pairs, and the threshold of 10 shared recipes limits this effect.
+
+Shared-recipe counts tell us which pairs are common. PMI tells us which pairs
+are more common than their frequencies predict. Table~\ref{tab:pmi} gives two
+examples. Salt and garlic occur together in 7{,}571 recipes, but both are so
+frequent that about 6{,}554 shared recipes are expected by chance, a ratio of
+1.16 (PMI $0.21$). Ginger and soy sauce share fewer recipes (1{,}010) but
+about 4.5 times more than expected (PMI $2.16$). On the same 10{,}853 edges,
+Louvain finds 3 communities when the weights are the shared-recipe counts and
+5 when they are the PMI values. We do not compare the modularity of the two
+partitions, because the two weightings define different weighted graphs. We
+report this comparison only to show that the weighting changes the groups.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}l r r r r r@{}}
+\toprule
+Pair & $c_i$ & $c_j$ & Together & Expected if independent & Ratio \\
+\midrule
+Salt -- Garlic & 18{,}745 & 15{,}995 & 7{,}571 & 6{,}554 & 1.16 \\
+Ginger -- Soybean Sauce & 3{,}418 & 3{,}029 & 1{,}010 & 226 & 4.46 \\
+\bottomrule
+\end{tabular}
+\caption{Recipes that contain both ingredients of a pair, compared with the
+number expected if the two ingredients were independent, $c_i c_j / N$. The
+ratio is the observed number divided by the expected number; its base-2
+logarithm is the PMI. Two examples do not show that PMI is better for every
+pair.}
+\label{tab:pmi}
+\end{table}
