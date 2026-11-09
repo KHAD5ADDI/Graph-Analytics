@@ -1,0 +1,4 @@
+graph,x,y,rho,p_value,n
+ingredients,frequency,betweenness_hop,0.9678611557689771,6.638051404411567e-218,362
+ingredients,frequency,betweenness_pmi,0.3229653105248884,3.1136070086877944e-10,362
+ingredients,frequency,degree,0.9545850726950156,2.1336932334264493e-191,362

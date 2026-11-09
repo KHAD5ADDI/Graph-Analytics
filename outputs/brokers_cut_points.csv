@@ -1,0 +1,11 @@
+graph,kind,item
+countries,articulation_point,Belarus
+countries,articulation_point,Costa Rica
+countries,articulation_point,Micronesia (Federated States of)
+countries,articulation_point,Tonga
+countries,articulation_point,Tuvalu
+countries,bridge,Belarus -- Canada
+countries,bridge,Costa Rica -- Nicaragua
+countries,bridge,Micronesia (Federated States of) -- Tuvalu
+countries,bridge,Samoa -- Tonga
+countries,bridge,Zambia -- Zimbabwe

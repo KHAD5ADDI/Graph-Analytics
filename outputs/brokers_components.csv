@@ -1,0 +1,7 @@
+graph,component,size,members
+ingredients,0,362,"(largest component, 362 nodes)"
+countries,0,166,"(largest component, 166 nodes)"
+countries,1,2,Zambia; Zimbabwe
+countries,2,1,Grenada
+countries,3,1,Jordan
+countries,4,1,Marshall Islands
