@@ -1,6 +1,37 @@
 % Owner: A
-%% Owner: A. Louvain \cite{blondel2008} on the weighted graph, NetworkX
-%% louvain_communities, resolution 1, seed 42 for the figures. Seed check over
-%% 30 seeds: range of community counts and modularity only (no NMI).
-%% Countries: compare communities with UN regions through a contingency table,
-%% descriptively (no significance tests).
+We find communities with the Louvain algorithm~\cite{blondel2008}, which
+NetworkX implements as \texttt{louvain\_communities}. We run it on the
+weighted graphs with resolution 1. Louvain seeks a partition with high
+modularity. For a partition $c$, let $w_{ij}$ be the weight of the edge
+between $i$ and $j$ (0 if there is none), $s_i=\sum_j w_{ij}$ the strength of
+$i$, and $W=\tfrac12\sum_{i,j} w_{ij}$ the total weight. The modularity is
+\[
+  Q = \frac{1}{2W}\sum_{i,j}\Bigl(w_{ij}-\frac{s_i s_j}{2W}\Bigr)\,
+      \delta(c_i,c_j),
+\]
+where $\delta(c_i,c_j)=1$ if $i$ and $j$ are in the same community and $0$
+otherwise. $Q$ compares the weight inside communities with the weight
+expected if edges were placed at random with the same strengths. Louvain
+starts with every node in its own community. It moves each node to the
+neighbouring community that raises $Q$ the most, then merges each community
+into one node and repeats until $Q$ no longer increases. The order in which
+nodes are visited is random, so the result depends on the random seed.
+
+We use seed $42$ for all tables and figures. In every table and figure,
+communities are numbered by decreasing size, and ties are broken by the
+alphabetically smallest member. To see how much the result depends on the
+seed, we also run Louvain with 30 other seeds (0 to 29) on each graph. We
+report the number of communities, the range of modularity, and the groups of
+nodes that share a community in at least 27 of the 30 runs; a group is a set
+of nodes linked, directly or through other nodes, by this relation. We do not
+compare partitions with measures such as NMI or ARI.
+
+For the countries, we compare the communities with the UN regions through a
+contingency table, which counts the countries of each region in each
+community. This comparison is descriptive. The shuffle test, which adds
+evidence, is described in the sensitivity subsection.
+
+A community is a group of nodes that are strongly linked to each other:
+ingredients used together, or countries whose dishes share ingredients. We do
+not call the ingredient communities cuisines, because we did not check them
+against the cuisine labels.

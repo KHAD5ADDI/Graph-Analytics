@@ -1,3 +1,16 @@
 % Owner: A
-%% Owner: A. B checks every count against the raw files. Budget: 2.5 pages.
-\guidance{Describe the dataset and its source, explain how it is represented as a graph, and report relevant graph statistics, including the numbers of nodes and edges.}
+Our data are lists of recipes and dishes, not graphs. We turn them into two
+graphs that we build and analyse separately. In both, edges are undirected,
+because the relation is symmetric: if ingredient $i$ occurs with ingredient
+$j$, then $j$ occurs with $i$, and the Jaccard similarity of two ingredient
+sets does not depend on their order. Both graphs are simple: there are no
+loops and at most one edge between two nodes, so a pair that occurs in many
+recipes becomes one weighted edge.
+
+In the \emph{ingredient graph}, a node is an ingredient, an edge joins two
+ingredients that occur together in enough recipes, and its weight is the
+pointwise mutual information (PMI) of the pair. In the \emph{country graph},
+a node is a country, an edge joins two countries whose dishes share enough
+ingredients, and its weight is the Jaccard similarity of their ingredient
+sets. Table~\ref{tab:stats} gives the required statistics of both graphs. The
+subsections below present the sources and the construction of each graph.

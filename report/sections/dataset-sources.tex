@@ -1,12 +1,38 @@
 % Owner: A
-%% - CulinaryDB \cite{culinarydb}: 45,772 recipes, 26 cuisine labels; PMI uses the
-%%   45,749 recipes that have mapped ingredients. Duplicate recipe-ingredient pairs
-%%   removed (456,279 -> 412,560). 103 compound ingredients, 95 used, 54 in graph.
-%%   Imbalance: USA 16,118 and Italy 7,504 recipes.
-%% - EnviDat \cite{wunderlich2022data}: 350 valid dishes (171 national + 179
-%%   others), 218 ingredient columns, 171 country/territory labels. cp1252, ';'
-%%   separator; one malformed row and one stray value (58) discarded.
-%% - UN M49 regions \cite{unregions}, joined on ISO3 (ZAR -> COD, ROM -> ROU).
-%% - Why CulinaryDB: downloadable CSV bundle, open licence. Do not say RecipeDB
-%%   has no bulk download.
-%% - Data are in the GitHub repository with their licences.
+\paragraph{CulinaryDB.}
+CulinaryDB~\cite{culinarydb}, from the Complex Systems Laboratory (CoSyLab)
+at IIIT-Delhi, is distributed as four CSV files under a CC BY-NC-SA 3.0
+licence. We use this readily downloadable bundle. It contains 45{,}772
+recipes, each with a cuisine label (26 labels), and the data providers have
+mapped the ingredient names used in the recipes to a list of ingredients. This
+mapping gives 456{,}279 recipe--ingredient pairs, or 412{,}560 once we remove
+duplicate pairs. In all, 695 distinct ingredients occur in recipes, among them
+95 of the 103 compound ingredients, such as garam masala. Of the 45{,}772
+recipes, 45{,}749 have at least one mapped ingredient. The sample is
+unbalanced: 16{,}118 recipes carry the label USA and 7{,}504 the label Italy,
+while the smallest labels have 14 and 15 recipes. We use the cuisine labels
+neither to build the graphs nor to evaluate the communities.
+
+\paragraph{National dishes.}
+The dataset of Wunderlich and Kohler~\cite{wunderlich2022data}, described in
+a data paper~\cite{wunderlich2022paper}, is published on EnviDat under the
+ODbL licence with the Database Contents License. It lists dishes of 171
+countries and territories, with 218 binary ingredient indicators, and was
+collected between 4 June and 23 August 2018. The file uses semicolons as
+separators and the cp1252 encoding. It contains one malformed row, without
+country or dish and with a stray value (58) in one ingredient column; we
+discard it. The 350 remaining dishes are the 171 dishes that the file flags as
+the national dish of their country (one per country) and 179 further dishes.
+
+\paragraph{UN regions.}
+To place countries in regions, we use the United Nations (UN) region and
+sub-region of each country from a public table~\cite{unregions}, licensed
+CC BY-SA 4.0 (version of 19 June 2024). We join it to the dishes through
+ISO 3166 alpha-3 codes, never through country names. Two codes in the dishes
+file are obsolete (ZAR and ROM) and we map them to COD and ROU. All 171
+countries obtain a region. We use the regions only to describe the country
+communities.
+
+The raw files are in the project's GitHub repository
+(\url{https://github.com/KHAD5ADDI/Graph-Analytics}) with their original
+licences.
