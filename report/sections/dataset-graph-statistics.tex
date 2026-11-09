@@ -2,6 +2,12 @@
 %% Values re-checked on 8 Nov 2026 against brokers_components.csv,
 %% brokers_cut_points.csv, sensibilite_ingredients.csv (10/0.0), and
 %% sensibilite_pays.csv (all/0.3) on origin/analysis/brokers-geography.
+Table~\ref{tab:stats} summarises both graphs. Both are undirected, simple and
+weighted. The ingredient graph is connected, so its diameter and radius cover
+all $362$ ingredients. The country graph has five connected components, so we
+compute its diameter and radius on the largest one, which holds $166$ of the
+$171$ countries (Section~\ref{sec:connectivity}).
+
 \begin{table}[h]
 \centering
 \begin{tabular}{lrr}

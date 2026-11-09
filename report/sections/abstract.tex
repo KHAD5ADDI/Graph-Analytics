@@ -7,8 +7,8 @@ build a country graph from a dataset of national dishes~\cite{wunderlich2022data
 using Jaccard similarity between ingredient sets as edge weights. We use
 graph statistics, degree, strength, betweenness, Louvain communities and
 modularity. We examine articulation points and bridges, compare rankings
-with Spearman correlation, and add a shuffle test for agreement with UN
-regions. We examine how thresholds change connectivity and modularity.
+with Spearman correlation, add a shuffle test for agreement with UN
+regions, and vary the thresholds that define the graphs.
 The ingredient graph has five communities (five in 28 of 30 Louvain
 seeds) and modularity $0.400$. Hop betweenness follows frequency ($\rho=0.968$), with Water,
 Salt and Butter leading. With $1/\mathrm{PMI}$ distances, Couscous,
