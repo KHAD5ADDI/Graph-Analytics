@@ -25,7 +25,6 @@
 
 \newcommand{\guidance}[1]{\par\smallskip\noindent\textit{#1}\par\smallskip}
 
-% TODO (both): final title. Avoid "bridges": in the course a bridge is a cut edge.
 \title{Communities and Brokers in Ingredient Networks of World Cuisines}
 \author{
   Khadidja Addi\\
@@ -51,7 +50,7 @@
 \section{Dataset Presentation}
 \input{sections/dataset}
 
-\subsection{Sources}
+\subsection{Sources}\label{sec:sources}
 \input{sections/dataset-sources}
 
 \subsection{Ingredient graph}
@@ -98,14 +97,13 @@
 \subsection{Countries and geography}
 \input{sections/results-countries-and-geography}
 
-\subsection{Sensitivity to thresholds}
+\subsection{Sensitivity to thresholds}\label{sec:res-sensitivity}
 \input{sections/results-sensitivity-to-thresholds}
 
 % ============================================================================
 \section{Conclusions}
 \input{sections/conclusions}
 
-\guidance{Add references to \texttt{biblio.bib} and cite them in the text using \texttt{\textbackslash cite\{key\}}. Include sources for data, software, methods, and reused code.}
 \bibliographystyle{plain}
 \bibliography{biblio}
 
