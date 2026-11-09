@@ -1,0 +1,17 @@
+% Owner: A
+%% - Start from the recipe-ingredient bipartite graph; project it onto
+%%   ingredients, as in the course \cite{quercini2026}. The course weights the
+%%   projection by the number of common neighbours (shared recipes). We then
+%%   filter and replace that count with PMI. Do NOT call the PMI graph the
+%%   taught projection.
+%% - Nodes: ingredients in >= 50 recipes (362). Edges: >= 10 shared recipes AND
+%%   PMI > 0. Weight: PMI \cite{church1990}, formula below.
+%% - Justification of PMI (from the roadmap): counts say which pairs are common,
+%%   PMI says which pairs are more common than chance. Salt-Garlic 7,571 together
+%%   vs 6,554 expected (ratio 1.16); Ginger-Soy sauce 1,010 vs 226 (ratio 4.46).
+%%   Do not argue from modularity across the two weightings.
+%% - Undirected (co-occurrence is symmetric), simple (one weighted edge per pair).
+\begin{equation*}
+  \mathrm{PMI}(i,j) = \log_2 \frac{c_{ij}\, N}{c_i\, c_j}
+\end{equation*}
+%% c_ij = recipes containing both, c_i = recipes containing i, N = 45,749.

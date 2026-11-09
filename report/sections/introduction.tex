@@ -1,0 +1,45 @@
+% Owner: B
+Counting how often an ingredient appears tells us how common it is in a
+collection of recipes. It does not tell us which ingredients occur
+together. A graph of co-occurrence represents these combinations as
+relations. We can then study groups of ingredients and the ingredients
+that lie on many shortest paths. At the country level, shared ingredients
+also let us compare dish profiles with a common measure.
+
+Our central question is: \emph{What communities and connecting nodes emerge from ingredient-based graphs of sampled recipes and countries?}
+We address it in two parts. For ingredients, we ask whether structural
+rankings differ from frequency rankings and how much the answer depends
+on the weighting used for shortest paths. We call ingredients with high
+betweenness brokers. For countries, we ask how communities relate,
+descriptively, to United Nations (UN) regions~\cite{unregions}.
+
+The first graph uses recipes from CulinaryDB~\cite{culinarydb}. We start
+with a bipartite graph linking recipes to their ingredients and project it
+onto ingredients, following a method taught in the course~\cite{quercini2026}.
+We then filter the pairs and replace shared-recipe counts with pointwise
+mutual information (PMI) weights~\cite{church1990}. Ingredients are nodes,
+and retained co-occurrences are edges. PMI measures association relative
+to independent occurrence. The second graph uses the national-dishes
+dataset~\cite{wunderlich2022data}. Each node is a country. We combine the
+ingredients of all recorded dishes for each country into one set and
+weight edges by Jaccard similarity. This compares the ingredients shared
+by two countries with the ingredients in their union.
+
+Caprioli et al.~\cite{caprioli2025} study networks of ingredient combinations
+on CulinaryDB data as culinary fingerprints of cuisines. Our project uses
+single ingredients as nodes with PMI weights. We focus on brokers through
+betweenness and add a country graph whose communities we compare with UN
+regions. We did not use their code.
+
+We follow the course methods~\cite{quercini2026} with
+NetworkX~\cite{hagberg2008}. We report the required graph statistics:
+node and edge counts, density, connected components, diameter, radius
+and average clustering. We study degree, strength and betweenness, and
+find communities with Louvain~\cite{blondel2008}, assessed with modularity.
+We also find articulation points and bridges. We compare centrality
+with recipe frequency using Spearman correlation, compare hop and
+$1/\mathrm{PMI}$ distances for betweenness, and vary the graph thresholds.
+We add one test outside the course: a shuffle test of agreement between
+country communities and UN regions.
+
+Section~2 presents the data and the two graphs, Section~3 the methods, Section~4 the results, and Section~5 our conclusions.

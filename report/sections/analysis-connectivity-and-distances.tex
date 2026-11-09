@@ -1,0 +1,17 @@
+% Owner: B
+We identify the connected components of each graph. A connected component is
+a maximal set of nodes in which a path joins every pair of nodes. We measure
+distance as the number of edges, or hops, in a shortest path. Following the
+course convention, distance is infinite between nodes in different
+components \cite{quercini2026}.
+
+We therefore compute diameter and radius only on the largest connected
+component, ignoring edge weights. The diameter is the greatest distance
+between any pair of nodes in that component. To obtain the radius, we find
+each node's greatest distance to another node, then take the smallest of
+these values. These measures describe distances within this component only.
+
+An articulation point (cut vertex) is a node whose removal, together with its
+incident edges, increases the number of connected components. A bridge (cut
+edge) is an edge whose removal increases that number. We find both with
+NetworkX \cite{hagberg2008}.

@@ -1,0 +1,20 @@
+% Owner: B
+%% RECHECK all numbers after the final run on main.
+We ask what communities and connecting nodes emerge from ingredient-based
+graphs of sampled recipes and countries. We project the CulinaryDB
+recipe--ingredient bipartite graph~\cite{culinarydb} onto ingredients and
+weight retained edges by pointwise mutual information (PMI). We also
+build a country graph from the national-dishes dataset~\cite{wunderlich2022data},
+using Jaccard similarity between ingredient sets as edge weights. We use
+graph statistics, degree, strength, betweenness, Louvain communities and
+modularity. We examine articulation points and bridges, compare rankings
+with Spearman correlation, and add a shuffle test for agreement with UN
+regions. We examine how thresholds change connectivity and modularity.
+The ingredient graph has five communities and modularity
+$0.400$. Hop betweenness follows frequency ($\rho=0.968$), with Water,
+Salt and Butter leading. With $1/\mathrm{PMI}$ distances, Couscous,
+Lasagna and Shallot lead, and the correlation is $\rho=0.323$. Country
+communities agree with UN regions for $64.3\%$ of countries, against a
+mean of $34.0\%$ over $1{,}000$ shuffles ($p\approx0.001$). We find that
+the distance choice changes ingredient broker rankings, while country
+communities show a partial association with geography.

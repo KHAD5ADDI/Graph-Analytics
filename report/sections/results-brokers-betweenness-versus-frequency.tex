@@ -1,0 +1,70 @@
+% Owner: B
+Table~\ref{tab:brokers} compares the leading ingredients under our two
+distance choices. With hop distances, Water, Salt and Butter lead the
+ranking. Across all ingredients, the Spearman correlation between frequency
+and hop betweenness is $\rho=0.968$. Degree also follows frequency
+($\rho=0.955$). Common ingredients are the path intermediaries in this
+graph. We read these correlations descriptively, because frequency and
+edges come from the same recipes.
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{r l r l r}
+\toprule
+& \multicolumn{2}{c}{Hop betweenness} & \multicolumn{2}{c}{$1/\mathrm{PMI}$ betweenness} \\
+Rank & Ingredient & Frequency & Ingredient & Frequency \\
+\midrule
+1 & Water & 10{,}128 & Couscous & 245 \\
+2 & Salt & 18{,}745 & Lasagna & 206 \\
+3 & Butter & 12{,}656 & Shallot & 2{,}101 \\
+4 & Lemon & 4{,}168 & Coconut & 906 \\
+5 & Cream & 6{,}022 & Saffron & 576 \\
+6 & Sugar & 13{,}430 & Molasses & 415 \\
+7 & Onion & 13{,}877 & Fish & 855 \\
+8 & Pepper & 16{,}065 & Coconut Milk & 650 \\
+9 & Capsicum & 5{,}895 & Pecans & 693 \\
+10 & Cooking Oil & 5{,}440 & Yeast & 910 \\
+\bottomrule
+\end{tabular}
+\caption{Leading ingredients by betweenness under each distance choice.
+Frequency counts recipes containing the ingredient. The rankings describe
+shortest paths under the stated distances only.}
+\label{tab:brokers}
+\end{table}
+
+With $1/\mathrm{PMI}$ distances, the leaders become Couscous, Lasagna,
+Shallot, Coconut and Saffron. The Spearman correlation with frequency falls
+to $\rho=0.323$. We interpret these ingredients as brokers under this
+distance choice only. Stronger PMI associations give shorter steps, so
+these shortest paths need not use the most frequent ingredients.
+
+\paragraph{Inspecting individual ingredients.}
+We number communities by decreasing size, with community $0$ the largest.
+Water occurs in $10{,}128$ recipes and has degree $189$. It ranks $1$ by
+hop betweenness but $332$ by $1/\mathrm{PMI}$ betweenness. Of its neighbours,
+$72$ are inside its community $1$ and $117$ are outside. Its strongest PMI
+partners are Yeast ($1.67$), Meat bouillon ($1.54$), Gelatin ($1.48$), Gin
+($1.47$) and Bulgur ($1.45$). Yeast, Gelatin and Gin belong to community $1$;
+Meat bouillon and Bulgur belong to community $0$. These neighbours connect
+Water to baking, setting mixtures, drinks, broth and grain ingredients.
+
+Shallot occurs in $2{,}101$ recipes and has degree $155$. Its ranks are $31$
+with hops and $3$ with $1/\mathrm{PMI}$ distances. It has $77$ neighbours
+inside community $0$ and $78$ outside. Its strongest PMI partners are
+Chanterelle ($3.34$), Chervil ($3.06$), Oyster mushroom ($2.95$), Madeira wine
+($2.95$) and Cognac Brandy ($2.87$). These links connect Shallot to mushrooms,
+a herb and cooking alcohols. Oyster mushroom belongs to community $3$;
+the other listed partners belong to community $0$.
+
+Couscous occurs in $245$ recipes and has degree $54$. It ranks $175$ with
+hops and $1$ with $1/\mathrm{PMI}$ distances. It has $28$ neighbours inside
+community $0$ and $26$ outside. Its strongest PMI partners are Turnip
+($3.96$), Vegetable Broth ($3.58$), Apricot ($3.53$), Butternut squash ($3.44$)
+and Currant ($3.30$). The vegetables and broth belong to community $0$;
+the fruit belongs to community $1$. Couscous thus links vegetable and
+broth ingredients with fruit.
+
+The ingredient graph has no articulation point and no bridge, so no single
+ingredient or edge holds it together. Betweenness therefore measures how
+much an ingredient brokers paths, not a single point of failure.
