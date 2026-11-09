@@ -116,43 +116,43 @@ footer { color: var(--ink-3); font-size: 13px; }
       <h1>The Hidden Bridges of World Cuisines</h1>
       <p class="sub" id="sub"></p>
     </div>
-    <div class="tabs" role="tablist" aria-label="Graphe affiché">
-      <button role="tab" id="tab-ingredients" aria-selected="true" data-key="ingredients">Ingrédients</button>
-      <button role="tab" id="tab-pays" aria-selected="false" data-key="pays">Pays</button>
+    <div class="tabs" role="tablist" aria-label="Graph shown">
+      <button role="tab" id="tab-ingredients" aria-selected="true" data-key="ingredients">Ingredients</button>
+      <button role="tab" id="tab-pays" aria-selected="false" data-key="pays">Countries</button>
     </div>
   </header>
 
   <div class="controls">
-    <label class="field" for="q">Chercher
-      <input type="search" id="q" list="names" placeholder="ex. Cumin, Morocco" autocomplete="off">
+    <label class="field" for="q">Search
+      <input type="search" id="q" list="names" placeholder="e.g. Cumin, Morocco" autocomplete="off">
       <datalist id="names"></datalist>
     </label>
-    <label class="field" for="size">Taille des nœuds
+    <label class="field" for="size">Node size
       <select id="size">
-        <option value="force">Force (somme des poids)</option>
-        <option value="btw">Intermédiarité</option>
-        <option value="eig">Vecteur propre</option>
-        <option value="part">Participation</option>
+        <option value="force">Strength (sum of weights)</option>
+        <option value="deg">Degree</option>
+        <option value="btw">Hop betweenness (primary)</option>
+        <option value="btw2">Betweenness, distance 1/weight</option>
       </select>
     </label>
-    <label class="field" for="color" id="color-field" hidden>Couleur
+    <label class="field" for="color" id="color-field" hidden>Colour
       <select id="color">
-        <option value="c">Communautés (Louvain)</option>
-        <option value="region">Régions de l'ONU</option>
+        <option value="c">Communities (Louvain)</option>
+        <option value="region">UN regions</option>
       </select>
     </label>
-    <label class="toggle" for="bridges" id="bridges-field"><input type="checkbox" id="bridges"> Ne montrer que les ponts</label>
+    <label class="toggle" for="bridges" id="bridges-field"><input type="checkbox" id="bridges"> Show brokers only (top 10 by hop betweenness)</label>
   </div>
 
-  <div class="legend" id="legend" aria-label="Filtrer par groupe"></div>
+  <div class="legend" id="legend" aria-label="Filter by group"></div>
 
   <div class="main">
     <div class="stage" id="stage">
-      <canvas id="cv" aria-label="Réseau interactif"></canvas>
+      <canvas id="cv" aria-label="Interactive network"></canvas>
       <div class="zoom">
-        <button id="zin" aria-label="Zoomer">+</button>
-        <button id="zout" aria-label="Dézoomer">−</button>
-        <button id="zfit" class="wide" aria-label="Recentrer">⤢</button>
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">−</button>
+        <button id="zfit" class="wide" aria-label="Fit to view">⤢</button>
       </div>
       <div class="stage-note" id="note"></div>
       <div class="tip" id="tip" hidden></div>
@@ -167,9 +167,9 @@ footer { color: var(--ink-3); font-size: 13px; }
 const DATA = /*__DATA__*/null;
 const PALETTE = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc948",
                  "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac", "#86bcb6", "#d37295"];
-const REGIONS = { Europe: ["Europe", "#4e79a7"], Asia: ["Asie", "#e15759"], Africa: ["Afrique", "#59a14f"],
-                  Americas: ["Amériques", "#f28e2b"], Oceania: ["Océanie", "#b07aa1"] };
-const METRICS = { force: "Force", deg: "Degré", btw: "Intermédiarité", eig: "Vecteur propre", part: "Participation" };
+const REGIONS = { Europe: ["Europe", "#4e79a7"], Asia: ["Asia", "#e15759"], Africa: ["Africa", "#59a14f"],
+                  Americas: ["Americas", "#f28e2b"], Oceania: ["Oceania", "#b07aa1"] };
+const METRICS = { force: "Strength", deg: "Degree", btw: "Hop betweenness", btw2: "Betweenness (1/weight)" };
 const SHORT = { "Saint Vincent and the Grenadines": "St Vincent", "Lao People's Democratic Republic": "Laos",
   "Korea, Rep. of Korea": "Korea", "Bosnia and Herzegovina": "Bosnia", "Saint Kitts and Nevis": "St Kitts",
   "Micronesia (Federated States of)": "Micronesia", "Iran (Islamic Republic of)": "Iran",
@@ -219,7 +219,7 @@ function colorOf(n) {
 }
 function visible(n) {
   if (S.hidden.has(groupOf(n))) return false;
-  if (S.bridgesOnly && S.key === "ingredients" && !n.bridge) return false;
+  if (S.bridgesOnly && S.key === "ingredients" && !n.broker) return false;
   return true;
 }
 function radius(n) {
@@ -307,7 +307,7 @@ function draw() {
     ctx.fillStyle = colorOf(n);
     ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
     ctx.lineWidth = 1; ctx.strokeStyle = T.surface; ctx.stroke();
-    if (n.bridge) { ctx.lineWidth = 2; ctx.strokeStyle = T.ink; ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke(); }
+    if (n.broker) { ctx.lineWidth = 2; ctx.strokeStyle = T.ink; ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke(); }
     ctx.globalAlpha = 1;
   }
   if (sel) {
@@ -330,14 +330,14 @@ function draw() {
     const vis = gr.nodes.filter(visible);
     const nTop = Math.round((S.key === "ingredients" ? 14 : 12) * Math.min(3, S.view.k));
     names = [...vis].sort((a, b) => b[S.size] - a[S.size]).slice(0, nTop).map(n => n.id);
-    if (S.key === "ingredients") names.push(...vis.filter(n => n.bridge).map(n => n.id));
+    if (S.key === "ingredients") names.push(...vis.filter(n => n.broker).map(n => n.id));
     if (S.key === "pays") names.push(...vis.filter(n => !n.lcc).map(n => n.id));
   }
   if (q) names.push(...gr.nodes.filter(n => visible(n) && n.id.toLowerCase().includes(q)).slice(0, 20).map(n => n.id));
   for (const id of new Set(names)) {
     const n = gr.byId.get(id); if (!n || !visible(n)) continue;
     const below = S.key === "pays" && !n.lcc;
-    label(short(n.id), sx(n), sy(n) + (below ? radius(n) + 12 : -radius(n) - 9), n.bridge || id === S.sel);
+    label(short(n.id), sx(n), sy(n) + (below ? radius(n) + 12 : -radius(n) - 9), n.broker || id === S.sel);
   }
   if (S.hover && S.hover !== S.sel) {
     const n = gr.byId.get(S.hover);
@@ -396,12 +396,12 @@ $("zfit").onclick = () => { fit(); draw(); };
 
 function groupName(n) {
   if (S.key === "pays" && S.color === "region") return (REGIONS[n.region] || [n.region])[0];
-  return "Communauté " + n.c;
+  return "Community " + n.c;
 }
 function showTip(n, x, y) {
-  const extra = S.key === "ingredients" ? `${n.nrec.toLocaleString("fr-FR")} recettes` : `${(REGIONS[n.region] || [n.region])[0]} · ${n.ning} ingrédients`;
-  tip.innerHTML = `<b>${esc(n.id)}</b>${n.bridge ? " · pont" : ""}<br>${esc(groupName(n))} · ${extra}<br>` +
-    `<span class="m">${METRICS[S.size]} ${fmt(n[S.size], S.size)} (rang ${g().ranks[S.size].get(n.id)}/${g().nodes.length})</span>`;
+  const extra = S.key === "ingredients" ? `${n.nrec.toLocaleString("en-US")} recipes` : `${(REGIONS[n.region] || [n.region])[0]} · ${n.ning} ingredients`;
+  tip.innerHTML = `<b>${esc(n.id)}</b>${n.broker ? " · broker" : ""}<br>${esc(groupName(n))} · ${extra}<br>` +
+    `<span class="m">${METRICS[S.size]} ${fmt(n[S.size], S.size)} (rank ${g().ranks[S.size].get(n.id)}/${g().nodes.length})</span>`;
   tip.hidden = false;
   const w = tip.offsetWidth, h = tip.offsetHeight;
   tip.style.left = Math.min(x + 14, S.W - w - 8) + "px";
@@ -427,21 +427,21 @@ function renderPanel() {
       `<span class="w">${w.toFixed(2)}</span></button></li>`;
   }).join("");
   const meta = S.key === "ingredients"
-    ? `Catégorie : ${esc(n.cat || "—")} · présent dans ${n.nrec.toLocaleString("fr-FR")} recettes`
-    : `${esc(n.sub)} · plat national à ${n.ning} ingrédients${n.lcc ? "" : " · hors de la plus grande composante"}`;
+    ? `Category: ${esc(n.cat || "—")} · in ${n.nrec.toLocaleString("en-US")} recipes`
+    : `${esc(n.sub)} · ${n.ning} ingredients across the dishes${n.lcc ? "" : " · outside the largest connected component"}`;
   p.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:6px">
       <h2>${esc(n.id)}</h2>
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-        <span class="badge"><span class="dot" style="background:${PALETTE[n.c % PALETTE.length]}"></span>Communauté ${n.c}</span>
+        <span class="badge"><span class="dot" style="background:${PALETTE[n.c % PALETTE.length]}"></span>Community ${n.c}</span>
         ${S.key === "pays" ? `<span class="badge"><span class="dot" style="background:${(REGIONS[n.region] || ["", "#999"])[1]}"></span>${(REGIONS[n.region] || [n.region])[0]}</span>` : ""}
-        ${n.bridge ? `<span class="bridge-tag">Ingrédient pont</span>` : ""}
+        ${n.broker ? `<span class="bridge-tag">Broker: top 10 hop betweenness</span>` : ""}
       </div>
       <p>${meta}</p>
     </div>
-    <div><h3>Mesures (graphe complet)</h3><table>${rows}</table></div>
-    <div><h3>Liens les plus forts (${gr.weight_label})</h3><ul class="nb">${nbs}</ul></div>
-    <button class="ghost" id="clear">Désélectionner</button>`;
+    <div><h3>Measures (full graph)</h3><table>${rows}</table></div>
+    <div><h3>Strongest links (${gr.weight_label})</h3><ul class="nb">${nbs}</ul></div>
+    <button class="ghost" id="clear">Clear selection</button>`;
   bindPanel();
 }
 
@@ -450,22 +450,21 @@ function summaryHTML() {
   const comms = gr.communities.map(c =>
     `<li><span style="color:${PALETTE[c.id % PALETTE.length]}">●</span> <b>C${c.id}</b> (${c.size}) : ${c.top.map(t => `<button class="link" data-go="${esc(t)}">${esc(short(t))}</button>`).join(", ")}</li>`).join("");
   const key = S.key === "ingredients";
-  const topB = [...gr.nodes].sort((a, b) => b.btw - a.btw).slice(0, 5)
-    .map(n => `<button class="link" data-go="${esc(n.id)}">${esc(short(n.id))}</button>`).join(", ");
-  const bridges = key ? gr.nodes.filter(n => n.bridge).sort((a, b) => b.part - a.part)
-    .map(n => `<button class="link" data-go="${esc(n.id)}">${esc(n.id)}</button>`).join(", ") : "";
+  const link = n => `<button class="link" data-go="${esc(n.id)}">${esc(short(n.id))}</button>`;
+  const topHop = [...gr.nodes].sort((a, b) => b.btw - a.btw).slice(0, 5).map(link).join(", ");
+  const topW = [...gr.nodes].sort((a, b) => b.btw2 - a.btw2).slice(0, 5).map(link).join(", ");
   return `
-    <div><h3>${key ? "Graphe des ingrédients" : "Graphe des pays"}</h3>
-      <p>${key ? "Deux ingrédients sont reliés s'ils apparaissent ensemble dans les recettes plus souvent que le hasard ne le prévoit (PMI)."
-               : "Deux pays sont reliés si leurs plats nationaux partagent assez d'ingrédients (Jaccard ≥ 0,3)."}</p></div>
+    <div><h3>${key ? "Ingredient graph" : "Country graph"}</h3>
+      <p>${key ? "Two ingredients are linked if they appear together in recipes more often than chance predicts (PMI)."
+               : "Two countries are linked if their dishes share enough ingredients (Jaccard ≥ 0.3)."}</p></div>
     <div class="stats">
-      <div class="stat"><div class="k">Nœuds</div><div class="v">${gr.n_nodes}</div></div>
-      <div class="stat"><div class="k">Arêtes</div><div class="v">${gr.n_edges.toLocaleString("fr-FR")}</div></div>
+      <div class="stat"><div class="k">Nodes</div><div class="v">${gr.n_nodes}</div></div>
+      <div class="stat"><div class="k">Edges</div><div class="v">${gr.n_edges.toLocaleString("en-US")}</div></div>
     </div>
-    ${key ? `<div><h3>Ingrédients ponts</h3><p>Participation la plus élevée (degré ≥ 20) : ${bridges}.</p></div>` : ""}
-    <div><h3>Intermédiarité la plus forte</h3><p>${topB}</p></div>
-    <div><h3>Communautés (Louvain)</h3><ul class="list">${comms}</ul></div>
-    <p style="font-size:14px">Cliquez sur un nœud pour voir ses mesures et ses liens les plus forts. Faites glisser pour vous déplacer, molette ou pincement pour zoomer.</p>`;
+    <div><h3>Highest hop betweenness</h3><p>${topHop}</p></div>
+    <div><h3>Highest betweenness with distance 1/${gr.weight_label}</h3><p>${topW}</p></div>
+    <div><h3>Communities (Louvain)</h3><ul class="list">${comms}</ul></div>
+    <p style="font-size:14px">Click a node to see its measures and strongest links. Drag to pan, scroll or pinch to zoom.</p>`;
 }
 function bindPanel() {
   $("panel").querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go));
@@ -493,10 +492,10 @@ function setKey(key) {
   $("color-field").hidden = key !== "pays"; $("bridges-field").hidden = key !== "ingredients";
   const gr = g();
   $("sub").textContent = key === "ingredients"
-    ? "Quels ingrédients relient les traditions culinaires ?"
-    : "Les proximités culinaires suivent-elles la géographie ?";
-  $("note").textContent = `Affichage : ${gr.n_shown.toLocaleString("fr-FR")} arêtes les plus fortes sur ${gr.n_edges.toLocaleString("fr-FR")}. Les mesures portent sur le graphe complet.`;
-  $("foot").textContent = `Source : ${gr.source}. Couleurs identiques aux figures du rapport.`;
+    ? "Which ingredients connect culinary traditions?"
+    : "Does culinary proximity follow geography?";
+  $("note").textContent = `Drawn: the strongest edges of each node (${gr.n_shown.toLocaleString("en-US")} of ${gr.n_edges.toLocaleString("en-US")}). Measures use the full graph.`;
+  $("foot").textContent = `Source: ${gr.source}. Same colours as the report figures.`;
   $("names").innerHTML = gr.nodes.map(n => `<option value="${esc(n.id)}"></option>`).join("");
   fit(); renderLegend(); renderPanel(); draw();
 }

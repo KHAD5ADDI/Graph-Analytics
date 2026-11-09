@@ -1,4 +1,4 @@
-min_cooc,seuil_PMI,noeuds,aretes,densite,composantes,taille_LCC,diametre_LCC,rayon_LCC,clustering_moyen,communautes_Louvain,modularite
+min_cooccurrence,pmi_threshold,nodes,edges,density,components,lcc_size,diameter_lcc,radius_lcc,avg_clustering,louvain_communities,modularity
 5,0.0,362,14120,0.2161,1,362,3,2,0.542,5,0.374
 5,0.5,362,10127,0.155,1,362,3,2,0.431,5,0.394
 5,1.0,362,6507,0.0996,2,361,4,3,0.341,7,0.438

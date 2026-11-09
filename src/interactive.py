@@ -1,20 +1,19 @@
-"""Visualisation interactive des deux graphes (pour l'oral et le README).
+"""Interactive visualisation of the two graphs (for the oral and the README).
 
-Sortie : outputs/graphes_interactifs.html, un fichier autonome (donnees et code integres)
-a ouvrir dans un navigateur. Seule la police Google Fonts est chargee en ligne ; hors
-connexion, la page retombe sur une police systeme.
+Output: outputs/graphes_interactifs.html, a standalone file (data and code embedded) to open
+in a browser. Only the Google Fonts web font is loaded online; offline, the page falls back
+to a system font.
 
-- Onglet Ingredients : couleur = communaute Louvain, anneau = ingredient pont
-  (meme definition que fig_ingredients.png : participation la plus elevee
-  parmi les ingredients de degre >= 20).
-- Onglet Pays : couleur = communaute Louvain ou region de l'ONU (bascule).
-- Survol : mesures du noeud. Clic : voisins les plus forts dans le graphe COMPLET.
-- Comme pour les figures statiques, seules les aretes les plus fortes de chaque
-  noeud sont dessinees (squelette) ; les mesures viennent du graphe complet
-  (outputs/*_nodes.csv, produits par analyze.py).
+- Ingredients tab: colour = Louvain community; black ring = "broker", i.e. one of the 10
+  ingredients with the highest hop betweenness (same definition as fig_ingredients.png).
+- Countries tab: colour = Louvain community or UN region (toggle).
+- Hover: node measures. Click: strongest neighbours in the FULL graph.
+- As in the static figures, only the strongest edges of each node are drawn (a backbone);
+  measures come from the full graphs (outputs/*_nodes.csv, written by analyze.py).
+- Communities keep the numbering of the CSV files (by decreasing size).
 
-Pre-requis : build_graphs.py, analyze.py et geography.py deja executes.
-Usage : python src/interactive.py
+Requires build_graphs.py, analyze.py and geography.py to have been run.
+Usage: python src/interactive.py
 """
 import json
 from pathlib import Path
@@ -28,10 +27,11 @@ PROC = ROOT / "data" / "processed"
 TEMPLATE = Path(__file__).resolve().parent / "interactive_template.html"
 SEED = 42
 N_NEIGHBOURS = 8
+N_BROKERS = 10
 
 
 def backbone(G, k):
-    """Union des k aretes les plus fortes de chaque noeud (affichage seulement)."""
+    """Union of the k strongest edges of each node (display only)."""
     keep = set()
     for n in G:
         nb = sorted(G[n].items(), key=lambda x: x[1]["weight"], reverse=True)[:k]
@@ -50,25 +50,16 @@ def normalise(pos):
     return {n: ((p[0] - x0) / s, (p[1] - y0) / s) for n, p in pos.items()}
 
 
-def relabel_by_size(comm):
-    """Communautes renumerotees par taille decroissante (0 = la plus grande)."""
-    sizes = pd.Series(comm).value_counts()
-    order = {c: i for i, c in enumerate(sizes.index)}
-    return {n: order[c] for n, c in comm.items()}
-
-
-def node_records(G, measures, comm, pos, extra=None):
+def node_records(G, measures, comm, pos, weighted_col, extra=None):
     recs = []
     for n in G:
         m = measures.loc[n]
         nb = sorted(G[n].items(), key=lambda x: x[1]["weight"], reverse=True)[:N_NEIGHBOURS]
         r = {
             "id": n, "x": round(pos[n][0], 4), "y": round(pos[n][1], 4), "c": int(comm[n]),
-            "deg": int(m["degre"]), "force": round(float(m["force"]), 2),
-            "btw": round(float(m["intermediarite"]), 4),
-            # vecteur propre defini sur la plus grande composante seulement : null ailleurs
-            "eig": None if pd.isna(m["vecteur_propre"]) else round(float(m["vecteur_propre"]), 4),
-            "part": round(float(m["participation"]), 3),
+            "deg": int(m["degree"]), "force": round(float(m["strength"]), 2),
+            "btw": round(float(m["betweenness_hop"]), 4),
+            "btw2": round(float(m[weighted_col]), 4),
             "nb": [[v, round(float(d["weight"]), 3)] for v, d in nb],
         }
         if extra:
@@ -88,16 +79,16 @@ def communities_summary(recs, n_top=3):
 def ingredients():
     G = nx.read_graphml(PROC / "ingredient_graph.graphml")
     meas = pd.read_csv(OUT / "ingredients_nodes.csv", index_col=0, encoding="utf-8-sig")
-    comm = relabel_by_size(meas["communaute"].to_dict())
+    comm = meas["community"].to_dict()
     B = backbone(G, 6)
     pos = normalise(nx.spring_layout(B, weight="weight", k=0.35, iterations=300, seed=SEED))
     cats = nx.get_node_attributes(G, "category")
     nrec = nx.get_node_attributes(G, "n_recipes")
-    recs = node_records(G, meas, comm, pos,
+    recs = node_records(G, meas, comm, pos, "betweenness_pmi",
                         lambda n: {"cat": cats.get(n, ""), "nrec": int(nrec.get(n, 0))})
-    bridges = sorted((r for r in recs if r["deg"] >= 20), key=lambda r: -r["part"])[:12]
+    brokers = {r["id"] for r in sorted(recs, key=lambda r: -r["btw"])[:N_BROKERS]}
     for r in recs:
-        r["bridge"] = r["id"] in {b["id"] for b in bridges}
+        r["broker"] = r["id"] in brokers
     return {
         "key": "ingredients", "nodes": recs,
         "edges": [[u, v, round(float(d["weight"]), 3)] for u, v, d in B.edges(data=True)],
@@ -110,18 +101,18 @@ def ingredients():
 def countries():
     G = nx.read_graphml(PROC / "country_graph.graphml")
     meas = pd.read_csv(OUT / "countries_nodes.csv", index_col=0, encoding="utf-8-sig")
-    geo = pd.read_csv(OUT / "geo_pays_communautes.csv", encoding="utf-8-sig").set_index("pays")
-    comm = relabel_by_size(geo["communaute"].to_dict())
+    geo = pd.read_csv(OUT / "geo_pays_communautes.csv", encoding="utf-8-sig").set_index("country")
+    comm = geo["community"].to_dict()
     B = backbone(G, 5)
     comps = sorted(nx.connected_components(B), key=len, reverse=True)
     pos = nx.spring_layout(B.subgraph(comps[0]), weight="weight", k=0.22, iterations=500, seed=SEED)
     pos = normalise(pos)
     rest = [n for c in comps[1:] for n in sorted(c)]
-    for i, n in enumerate(rest):   # pays hors de la plus grande composante : une ligne en bas
+    for i, n in enumerate(rest):   # countries outside the largest component: one row at the bottom
         pos[n] = ((i + 0.5) / len(rest), 1.12)
     ning = nx.get_node_attributes(G, "n_ingredients")
-    recs = node_records(G, meas, comm, pos, lambda n: {
-        "region": geo.loc[n, "region"], "sub": geo.loc[n, "sous_region"],
+    recs = node_records(G, meas, comm, pos, "betweenness_jaccard", lambda n: {
+        "region": geo.loc[n, "region"], "sub": geo.loc[n, "subregion"],
         "ning": int(ning.get(n, 0)), "lcc": n not in rest})
     return {
         "key": "pays", "nodes": recs,
@@ -136,9 +127,9 @@ if __name__ == "__main__":
     data = {"ingredients": ingredients(), "pays": countries()}
     html = TEMPLATE.read_text(encoding="utf-8").replace(
         "/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")))
-    page = ('<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n'
+    page = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
             "</head>\n<body>\n" + html + "\n</body>\n</html>\n")
     (OUT / "graphes_interactifs.html").write_text(page, encoding="utf-8")
-    print("outputs/graphes_interactifs.html :",
+    print("outputs/graphes_interactifs.html:",
           {k: (len(v["nodes"]), len(v["edges"])) for k, v in data.items()})

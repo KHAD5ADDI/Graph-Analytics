@@ -1,13 +1,13 @@
-"""Figures des mesures (rapport et slides).
+"""Measure figures (repository extras; the report uses its own tables).
 
-Sorties (outputs/) :
-  - fig_centralites_ingredients.png / fig_centralites_pays.png : top 10 par
-    intermediarite, vecteur propre et participation (degre >= 20 pour les
-    ingredients, comme la definition des « ponts »), barre coloree par communaute
-  - fig_degres.png : distribution des degres des deux graphes
+Outputs (outputs/):
+  - fig_centralites_ingredients.png / fig_centralites_pays.png: top 10 by hop betweenness
+    (primary), by weighted betweenness with distance 1/weight (sensitivity: 1/PMI for
+    ingredients, 1/Jaccard for countries) and by strength; bar colour = Louvain community
+  - fig_degres.png: degree distribution of the two graphs
 
-Les valeurs viennent de outputs/*_nodes.csv (produits par analyze.py, graphe complet).
-Usage : python src/fig_mesures.py
+Values come from outputs/*_nodes.csv (written by analyze.py, full graphs).
+Usage: python src/fig_mesures.py
 """
 from pathlib import Path
 
@@ -30,22 +30,16 @@ plt.rcParams.update({"font.size": 10, "axes.edgecolor": GRID, "axes.labelcolor":
                      "xtick.color": MUTED, "ytick.color": INK, "axes.titlecolor": INK})
 
 
-def by_size(comm):
-    order = {c: i for i, c in enumerate(comm.value_counts().index)}
-    return comm.map(order)
-
-
 def load(name):
     df = pd.read_csv(OUT / f"{name}_nodes.csv", index_col=0, encoding="utf-8-sig")
-    if name == "countries":   # memes numeros de communaute que fig_pays.png
-        geo = pd.read_csv(OUT / "geo_pays_communautes.csv", encoding="utf-8-sig").set_index("pays")
-        df["communaute"] = geo["communaute"]
-    df["communaute"] = by_size(df["communaute"])
+    if name == "countries":   # same community numbers as fig_pays.png
+        geo = pd.read_csv(OUT / "geo_pays_communautes.csv", encoding="utf-8-sig").set_index("country")
+        df["community"] = geo["community"]
     return df
 
 
 def bar_panel(ax, s, comm, title, fmt):
-    s = s.dropna().sort_values().tail(10)   # vecteur propre : NaN hors de la plus grande composante
+    s = s.dropna().sort_values().tail(10)
     cols = [PALETTE[comm[n] % len(PALETTE)] for n in s.index]
     ax.barh(range(len(s)), s.values, color=cols, height=0.7, edgecolor="white", linewidth=1)
     ax.set_yticks(range(len(s)), [SHORT.get(n, n) for n in s.index])
@@ -60,49 +54,48 @@ def bar_panel(ax, s, comm, title, fmt):
     ax.tick_params(axis="y", length=0)
 
 
-def fig_centralites(name, label, source):
+def fig_centralities(name, label, source, weight_name, weight_label):
     df = load(name)
-    comm = df["communaute"]
-    part = df.loc[df["degre"] >= 20, "participation"] if name == "ingredients" else df["participation"]
+    comm = df["community"]
     fig, axes = plt.subplots(1, 3, figsize=(15, 5.2))
-    bar_panel(axes[0], df["intermediarite"], comm, "Intermédiarité\n(passages entre groupes)", "{:.3f}")
-    bar_panel(axes[1], df["vecteur_propre"], comm, "Vecteur propre\n(au cœur des voisins influents)", "{:.3f}")
-    bar_panel(axes[2], part, comm,
-              "Participation" + (" (degré ≥ 20)" if name == "ingredients" else "") + "\n(liens répartis entre communautés)",
-              "{:.2f}")
+    bar_panel(axes[0], df["betweenness_hop"], comm,
+              "Hop betweenness\n(primary: every edge is one step)", "{:.3f}")
+    bar_panel(axes[1], df[f"betweenness_{weight_name}"], comm,
+              f"Betweenness with distance 1/{weight_label}\n(sensitivity: stronger link = shorter step)", "{:.3f}")
+    bar_panel(axes[2], df["strength"], comm, "Strength\n(sum of edge weights)", "{:.1f}")
     n_comm = comm.nunique()
-    handles = [plt.Line2D([], [], marker="s", ls="", color=PALETTE[i], ms=9, label=f"Communauté {i}")
+    handles = [plt.Line2D([], [], marker="s", ls="", color=PALETTE[i], ms=9, label=f"Community {i}")
                for i in range(min(n_comm, 7))]
     fig.legend(handles=handles, loc="lower center", ncol=len(handles), frameon=False, fontsize=9.5)
-    fig.suptitle(f"{label} : top 10 par centralité — couleur = communauté Louvain\nSource : {source}",
+    fig.suptitle(f"{label}: top 10 by centrality, colour = Louvain community\nSource: {source}",
                  fontsize=13, color=INK)
     fig.tight_layout(rect=(0, 0.06, 1, 0.92))
     fig.savefig(OUT / f"fig_centralites_{'pays' if name == 'countries' else name}.png", dpi=150)
     plt.close(fig)
 
 
-def fig_degres():
+def fig_degrees():
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
-    for ax, name, label in [(axes[0], "ingredients", "Ingrédients"), (axes[1], "countries", "Pays")]:
-        d = load(name)["degre"]
+    for ax, name, label in [(axes[0], "ingredients", "Ingredients"), (axes[1], "countries", "Countries")]:
+        d = load(name)["degree"]
         ax.hist(d, bins=30, color="#4e79a7", edgecolor="white", linewidth=1)
         ax.axvline(d.mean(), color=INK, lw=1.2, ls="--")
-        ax.text(d.mean(), ax.get_ylim()[1] * 0.95, f"  moyenne {d.mean():.1f}", fontsize=9, color=INK, va="top")
-        ax.set_title(f"{label} ({len(d)} nœuds)", loc="left", fontweight="bold", fontsize=11)
-        ax.set_xlabel("Degré")
-        ax.set_ylabel("Nombre de nœuds")
+        ax.text(d.mean(), ax.get_ylim()[1] * 0.95, f"  mean {d.mean():.1f}", fontsize=9, color=INK, va="top")
+        ax.set_title(f"{label} ({len(d)} nodes)", loc="left", fontweight="bold", fontsize=11)
+        ax.set_xlabel("Degree (number of neighbours)")
+        ax.set_ylabel("Number of nodes")
         ax.grid(axis="y", color=GRID, lw=0.6)
         ax.set_axisbelow(True)
         for sp in ("top", "right"):
             ax.spines[sp].set_visible(False)
-    fig.suptitle("Distribution des degrés", fontsize=13, color=INK)
+    fig.suptitle("Degree distributions", fontsize=13, color=INK)
     fig.tight_layout()
     fig.savefig(OUT / "fig_degres.png", dpi=150)
     plt.close(fig)
 
 
 if __name__ == "__main__":
-    fig_centralites("ingredients", "Graphe des ingrédients", "CulinaryDB (CoSyLab, IIIT-Delhi)")
-    fig_centralites("countries", "Graphe des pays", "Wunderlich & Kohler (2022), EnviDat")
-    fig_degres()
+    fig_centralities("ingredients", "Ingredient graph", "CulinaryDB (CoSyLab, IIIT-Delhi)", "pmi", "PMI")
+    fig_centralities("countries", "Country graph", "Wunderlich & Kohler (2022), EnviDat", "jaccard", "Jaccard")
+    fig_degrees()
     print("fig_centralites_ingredients.png, fig_centralites_pays.png, fig_degres.png")
