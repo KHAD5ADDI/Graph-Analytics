@@ -25,6 +25,13 @@ ingredients of all recorded dishes for each country into one set and
 weight edges by Jaccard similarity. This compares the ingredients shared
 by two countries with the ingredients in their union.
 
+We chose recipe data because it is not already a graph, so the graph model
+is ours to build and justify. CulinaryDB is public and large, with
+$45{,}749$ recipes containing ingredients; its ingredient lists give a natural
+recipe--ingredient bipartite graph. The national-dishes data give one combined
+ingredient profile for each of $171$ countries, so we can ask whether culinary
+similarity follows geography.
+
 Caprioli et al.~\cite{caprioli2025} study networks of ingredient combinations
 on CulinaryDB data as culinary fingerprints of cuisines. Our project uses
 single ingredients as nodes with PMI weights. We focus on brokers through
@@ -37,9 +44,8 @@ node and edge counts, density, connected components, diameter, radius
 and average clustering. We study degree, strength and betweenness, and
 find communities with Louvain~\cite{blondel2008}, assessed with modularity.
 We also find articulation points and bridges. We compare centrality
-with recipe frequency using Spearman correlation, compare hop and
-$1/\mathrm{PMI}$ distances for betweenness, and vary the graph thresholds.
-Two elements go beyond the course: the PMI weights, and a shuffle test of
-agreement between country communities and UN regions.
+with recipe frequency using Spearman correlation and vary the graph thresholds.
+The PMI weights, conversions from PMI to distance, and the shuffle test of
+agreement with UN regions go beyond the course and are explained below.
 
 Section~2 presents the data and the two graphs, Section~3 the methods, Section~4 the results, and Section~5 our conclusions.

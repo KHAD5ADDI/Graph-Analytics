@@ -40,6 +40,11 @@ Group project, Graph Analytics course, Albert School, 2026
 >    uv run python robustness.py     # removal experiments on the ingredient graph
 >    uv run python geography.py      # communities vs UN regions, similarity vs distance
 >    uv run python visualize.py      # network figures (needs the output of geography.py)
+>    uv run python seed_stability.py # Louvain stability over 30 seeds
+>    uv run python pmi_justification.py # PMI vs counts on the same edges
+>    uv run python brokers.py        # ingredient brokers and cut points in both graphs
+>    uv run python shuffle_test.py   # country communities vs shuffled UN regions
+>    uv run python brokers_extra.py  # country brokers, rank gaps and a second PMI distance
 >    ```
 >
 > 4. Tables (CSV) and figures (PNG) are written to `outputs/`. All thresholds are parameters at the top of `src/build_graphs.py`.
@@ -158,6 +163,8 @@ These stay in the repository and are not part of the report.
 - [robustness.py](src/robustness.py) removes k ingredients (k from 0 to 60 of 362) following six strategies (participation coefficient, hop betweenness, 1/PMI betweenness, frequency, degree, and random with 20 draws) and measures global efficiency, the share of nodes in the largest component, the weight of inter-community edges (original partition) and the modularity recomputed with Louvain. It is repeated on a sparser graph (PMI ≥ 0.5, at least 20 shared recipes).
 - [fig_mesures.py](src/fig_mesures.py) draws the top-10 centrality bars and the degree distributions (`python fig_mesures.py`).
 - [interactive.py](src/interactive.py) writes a standalone interactive page, `outputs/graphes_interactifs.html` (`python interactive.py`). It needs the outputs of `analyze.py` and `geography.py`.
+
+[brokers_extra.py](src/brokers_extra.py) writes country centralities, ingredient betweenness-versus-degree rank gaps, a second PMI-distance comparison and summary measures to `outputs/brokers_extra_*.csv` for the report additions.
 
 ## Results
 
@@ -362,6 +369,9 @@ Removal experiments (repository only)
 │   ├── robustness.py                 # removal experiments on the ingredient graph (repository only)
 │   ├── geography.py                  # communities vs UN regions, similarity vs distance
 │   ├── visualize.py                  # network figures
+│   ├── brokers.py                    # ingredient brokers and cut points in both graphs
+│   ├── shuffle_test.py               # country communities vs shuffled UN regions
+│   ├── brokers_extra.py              # country brokers, rank gaps and a second PMI distance
 │   ├── fig_mesures.py                # centrality and degree figures (extra)
 │   ├── interactive.py                # interactive explorer, HTML (extra)
 │   └── interactive_template.html     # page template used by interactive.py
@@ -400,6 +410,11 @@ Prerequisites: [uv](https://docs.astral.sh/uv/getting-started/installation/). uv
    uv run python robustness.py
    uv run python geography.py
    uv run python visualize.py
+   uv run python seed_stability.py # Louvain stability over 30 seeds
+   uv run python pmi_justification.py # PMI vs counts on the same edges
+   uv run python brokers.py        # ingredient brokers and cut points in both graphs
+   uv run python shuffle_test.py   # country communities vs shuffled UN regions
+   uv run python brokers_extra.py  # country brokers, rank gaps and a second PMI distance
    ```
 
    `analyze.py` takes about 2 minutes (the sensitivity analysis rebuilds the graph for each threshold). On Windows, set `PYTHONIOENCODING=utf-8` if the console fails on accented country names. `seed_stability.py` and `pmi_justification.py` each take under a minute; `fig_mesures.py` and `interactive.py` are optional extras (see [section 7](#7-extra-analyses-and-visualisations)).

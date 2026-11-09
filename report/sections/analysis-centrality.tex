@@ -1,23 +1,32 @@
 % Owner: B
-We use the course definitions of centrality \cite{quercini2026}. For an
-ingredient, degree is its number of neighbours. We report this as a raw
-count. Strength is the sum of the PMI weights of its incident edges, so it
-summarises the ingredient's associations over its retained neighbours.
+We use the course definitions of centrality \cite{quercini2026}. Degree counts
+neighbours; strength sums incident edge weights. We compute both and hop
+betweenness on each graph. We use PMI weights for ingredients and Jaccard
+weights for countries.
 
 Betweenness sums, over pairs of other nodes, the share of their shortest
 paths that pass through the node considered. Our primary measure of brokers,
 meaning ingredients that lie on many shortest paths, is hop betweenness.
-We count shortest paths in hops and use NetworkX's default normalisation.
-This choice gives every retained edge the same length, regardless of its
-PMI weight.
+We give every edge the same length. NetworkX normalises by the number of
+pairs of other nodes: the value is the average share of their shortest paths
+passing through the node. Country betweenness uses the whole graph; pairs
+in different components contribute nothing.
 
-As a sensitivity comparison, we also compute betweenness with edge distance
-$1/\mathrm{PMI}$. We choose this convention because a stronger association
-means a shorter step. It changes which paths are shortest, so the broker
-ranking depends on how we interpret edge length. We keep hop betweenness as
-the primary measure.
+For sensitivity, we compute betweenness with edge distance $1/\mathrm{PMI}$
+and a second conversion, $d=1/(1+\mathrm{PMI})$. Any positive decreasing
+function of PMI can define edge lengths, making stronger associations shorter.
+The course gives no rule for choosing one. Here PMI ranges from $0.000636$
+to $6.643$, so $1/\mathrm{PMI}$ gives extreme distances up to about $1{,}573$.
+The second conversion gives distances of $0.131$--$0.9994$. It is still one
+choice among many: agreement tests robustness to these two conversions only.
+Hop betweenness remains our primary measure.
 
-To compare degree and both betweenness measures with ingredient frequency,
+We also subtract each ingredient's hop-betweenness rank from its degree rank.
+A positive rank gap means it ranks higher in betweenness than in degree.
+We compare these two taught measures to find betweenness beyond degree,
+restricting discussion to the hop top $50$ to avoid gaps among near-zero values.
+
+To compare degree and the betweenness measures with ingredient frequency,
 the number of recipes containing the ingredient, we use Spearman
 correlation, which compares ranks. We read these correlations descriptively
 because frequency comes from the same recipes as the graph. They do not

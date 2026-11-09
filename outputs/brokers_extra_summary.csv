@@ -1,0 +1,17 @@
+measure,value
+n_pairs_largest_component_ingredients,65341.0
+share_pairs_1_hop,0.1660978558638527
+share_pairs_2_hops,0.8151084311534871
+share_pairs_3_hops,0.018793712982660197
+rho_hop_betweenness_degree,0.973072098494366
+rho_frequency_inv1p,0.5943042790570091
+rho_inv_inv1p,0.9192413151192775
+rho_hop_inv1p,0.6489463700904428
+top10_overlap_inv_inv1p,6.0
+top10_overlap_hop_inv1p,0.0
+pmi_min,0.0006359265686101845
+pmi_max,6.643268274449399
+distance_inv_max,1572.508602975178
+distance_inv1p_min,0.13083408354811898
+distance_inv1p_max,0.9993644775769835
+rho_country_betweenness_degree,0.8159351171845994

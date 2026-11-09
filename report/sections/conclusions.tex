@@ -12,8 +12,12 @@ frequency, with Spearman correlation $\rho=0.968$. With $1/\mathrm{PMI}$
 distances, Couscous, Lasagna and Shallot lead instead, and the correlation
 with frequency is $\rho=0.323$. Common ingredients are the brokers when
 every edge counts as one step, while strongly associated but less
-frequent ingredients become brokers when stronger association means a
-shorter step. The graph has no
+frequent ingredients lead when stronger association means a shorter
+step. Because almost all pairs are within two hops, hop betweenness is
+close to degree ($\rho=0.973$); Milk, Egg, Flour, Orange and Cream rank
+clearly higher in betweenness than in degree. Couscous, Shallot, Coconut
+and Saffron remain leading brokers with a second distance,
+$1/(1+\mathrm{PMI})$, but Lasagna drops to rank $26$. The graph has no
 articulation point or bridge, so removing a single ingredient or edge
 does not split it.
 
@@ -28,6 +32,10 @@ This share is $64.3\%$, compared with a mean of $34.0\%$ over $1{,}000$
 shuffles ($p\approx0.001$). The regional comparison gives evidence of an
 association between ingredient similarity and UN regions. The mixed
 communities show that these labels do not describe the whole partition.
+Fiji, Uganda and Mauritius connect communities through many neighbours
+in other communities, while Tonga and Tuvalu rank high because they hold
+bridges.
+
 Across thresholds, modularity rises partly because the graphs split
 into more components, so it cannot choose the thresholds on its own.
 
@@ -39,13 +47,12 @@ depends on the random seed. Over $30$ seeds the ingredient graph has $4$
 to $6$ communities and modularity between $0.389$ and $0.402$, so the main
 groups are stable, but the reported partition is one of several possible
 results.
-For weighted betweenness, we use only $1/\mathrm{PMI}$
-as a distance choice; another conversion could give different rankings.
+We test two PMI-to-distance conversions and find only partial stability;
+other conversions could still change the weighted rankings.
 The shuffle test treats countries as exchangeable when it permutes
 region labels. This assumption does not account for dependence between
 neighbouring countries.
 
 Future work could use a more balanced recipe sample and fuller country profiles.
-We could compare Louvain with label propagation, try other conversions
-from PMI to distance, check the ingredient communities against the cuisine
+We could compare Louvain with label propagation, check the ingredient communities against the cuisine
 labels, and use shuffles that preserve some regional dependence.
