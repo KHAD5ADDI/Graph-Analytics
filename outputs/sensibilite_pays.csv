@@ -1,4 +1,4 @@
-profil,seuil_Jaccard,noeuds,aretes,densite,composantes,taille_LCC,diametre_LCC,rayon_LCC,clustering_moyen,communautes_Louvain,modularite
+profile,jaccard_threshold,nodes,edges,density,components,lcc_size,diameter_lcc,radius_lcc,avg_clustering,louvain_communities,modularity
 all,0.15,171,10310,0.7093,1,171,4,2,0.84,4,0.081
 all,0.2,171,7447,0.5123,1,171,4,2,0.737,4,0.123
 all,0.25,171,4466,0.3073,3,169,5,3,0.606,7,0.183

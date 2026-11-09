@@ -1,0 +1,3 @@
+weights,nodes,edges,louvain_communities,modularity,spearman_strength_vs_frequency
+PMI weights,362,10853,5,0.4,0.885
+shared-recipe counts,362,10853,3,0.274,0.983

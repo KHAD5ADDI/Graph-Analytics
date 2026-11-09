@@ -1,0 +1,519 @@
+<title>Hidden Bridges of World Cuisines</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@600;700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a tool page. Header with tabs, one control row, then the network canvas
+   beside a details panel (stacked below on phones). Community colours are the same
+   as the report figures, so slides, report and this page match. */
+:root {
+  --bg: #f6f5f1;
+  --surface: #ffffff;
+  --ink: #1d2024;
+  --ink-2: #4c5157;
+  --ink-3: #7b8087;
+  --line: #e2e0d9;
+  --edge: 60, 64, 70;
+  --accent: #a3471b;
+  --f-display: "Alegreya", Georgia, "Times New Roman", serif;
+  --f-body: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15171a; --surface: #1d2024; --ink: #ecebe6; --ink-2: #b8b9b6; --ink-3: #8a8d90;
+    --line: #2f3338; --edge: 210, 212, 214; --accent: #e08a5a; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15171a; --surface: #1d2024; --ink: #ecebe6; --ink-2: #b8b9b6; --ink-3: #8a8d90;
+  --line: #2f3338; --edge: 210, 212, 214; --accent: #e08a5a; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body {
+  color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 28px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(1.6rem, 3.2vw, 2.3rem); line-height: 1.1; margin: 0; text-wrap: balance; }
+.sub { color: var(--ink-2); margin: 4px 0 0; }
+.tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+.tabs button { font: 500 15px var(--f-body); border: 0; background: none; color: var(--ink-2); padding: 7px 16px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; }
+.field { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); }
+input[type="search"], select {
+  font: 15px var(--f-body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 0;
+}
+input[type="search"] { width: 220px; max-width: 100%; }
+.toggle { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible, .chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px; font: 14px var(--f-body); color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px 4px 8px; cursor: pointer;
+}
+.chip .dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.chip .n { font-family: var(--f-data); font-size: 12px; color: var(--ink-3); }
+.chip[aria-pressed="false"] { opacity: .42; }
+.chip[aria-pressed="false"] .dot { background: transparent !important; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; align-items: start; }
+.stage { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; height: min(76vh, 760px); min-height: 380px; touch-action: none; }
+canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+canvas.dragging { cursor: grabbing; }
+.zoom { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.zoom button { width: 34px; height: 34px; font: 600 17px var(--f-body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.zoom button.wide { font-size: 12px; }
+.stage-note { position: absolute; left: 12px; bottom: 10px; font-size: 13px; color: var(--ink-3); pointer-events: none; max-width: calc(100% - 24px); }
+.tip {
+  position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); border-radius: 8px;
+  padding: 7px 10px; font-size: 13px; line-height: 1.35; max-width: 240px; z-index: 3;
+}
+.tip b { font-size: 14px; }
+.tip .m { font-family: var(--f-data); font-size: 12px; opacity: .85; }
+aside { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+aside h2 { font-family: var(--f-display); font-size: 1.45rem; margin: 0; line-height: 1.15; overflow-wrap: anywhere; }
+aside h3 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 6px; font-weight: 700; }
+aside p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.badge .dot { width: 10px; height: 10px; border-radius: 50%; }
+.bridge-tag { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border: 1.5px solid var(--ink); border-radius: 999px; padding: 1px 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+td { padding: 5px 0; border-bottom: 1px solid var(--line); vertical-align: baseline; }
+td.v { text-align: right; font-family: var(--f-data); font-variant-numeric: tabular-nums; font-size: 13px; }
+td.r { text-align: right; color: var(--ink-3); font-size: 12px; width: 76px; font-variant-numeric: tabular-nums; }
+.nb { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.nb button { width: 100%; display: grid; grid-template-columns: 10px minmax(0, 1fr) 70px 46px; gap: 8px; align-items: center; background: none; border: 0; padding: 4px 2px; font: 14px var(--f-body); color: var(--ink); text-align: left; cursor: pointer; border-radius: 6px; }
+.nb button:hover { background: var(--bg); }
+.nb .dot { width: 9px; height: 9px; border-radius: 50%; }
+.nb .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nb .bar { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.nb .bar i { display: block; height: 100%; background: var(--ink-3); border-radius: 3px; }
+.nb .w { font-family: var(--f-data); font-size: 12px; color: var(--ink-2); text-align: right; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { border-top: 1px solid var(--line); padding-top: 6px; }
+.stat .k { font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+.stat .v { font-family: var(--f-data); font-size: 18px; }
+.list { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 15px; }
+.list li { padding: 1px 0; }
+.link { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.ghost { align-self: flex-start; font: 14px var(--f-body); color: var(--ink-2); background: none; border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+footer { color: var(--ink-3); font-size: 13px; }
+@media (max-width: 900px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+  .stage { height: 62vh; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>The Hidden Bridges of World Cuisines</h1>
+      <p class="sub" id="sub"></p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Graph shown">
+      <button role="tab" id="tab-ingredients" aria-selected="true" data-key="ingredients">Ingredients</button>
+      <button role="tab" id="tab-pays" aria-selected="false" data-key="pays">Countries</button>
+    </div>
+  </header>
+
+  <div class="controls">
+    <label class="field" for="q">Search
+      <input type="search" id="q" list="names" placeholder="e.g. Cumin, Morocco" autocomplete="off">
+      <datalist id="names"></datalist>
+    </label>
+    <label class="field" for="size">Node size
+      <select id="size">
+        <option value="force">Strength (sum of weights)</option>
+        <option value="deg">Degree</option>
+        <option value="btw">Hop betweenness (primary)</option>
+        <option value="btw2">Betweenness, distance 1/weight</option>
+      </select>
+    </label>
+    <label class="field" for="color" id="color-field" hidden>Colour
+      <select id="color">
+        <option value="c">Communities (Louvain)</option>
+        <option value="region">UN regions</option>
+      </select>
+    </label>
+    <label class="toggle" for="bridges" id="bridges-field"><input type="checkbox" id="bridges"> Show brokers only (top 10 by hop betweenness)</label>
+  </div>
+
+  <div class="legend" id="legend" aria-label="Filter by group"></div>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Interactive network"></canvas>
+      <div class="zoom">
+        <button id="zin" aria-label="Zoom in">+</button>
+        <button id="zout" aria-label="Zoom out">−</button>
+        <button id="zfit" class="wide" aria-label="Fit to view">⤢</button>
+      </div>
+      <div class="stage-note" id="note"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <aside id="panel" aria-live="polite"></aside>
+  </div>
+
+  <footer id="foot"></footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const PALETTE = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc948",
+                 "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac", "#86bcb6", "#d37295"];
+const REGIONS = { Europe: ["Europe", "#4e79a7"], Asia: ["Asia", "#e15759"], Africa: ["Africa", "#59a14f"],
+                  Americas: ["Americas", "#f28e2b"], Oceania: ["Oceania", "#b07aa1"] };
+const METRICS = { force: "Strength", deg: "Degree", btw: "Hop betweenness", btw2: "Betweenness (1/weight)" };
+const SHORT = { "Saint Vincent and the Grenadines": "St Vincent", "Lao People's Democratic Republic": "Laos",
+  "Korea, Rep. of Korea": "Korea", "Bosnia and Herzegovina": "Bosnia", "Saint Kitts and Nevis": "St Kitts",
+  "Micronesia (Federated States of)": "Micronesia", "Iran (Islamic Republic of)": "Iran",
+  "Tanzania, United Rep. of": "Tanzania", "Antigua and Barbuda": "Antigua",
+  "Republic of the Congo": "Congo", "United States of America": "USA" };
+const short = s => SHORT[s] || s;
+const ok = v => typeof v === "number" && Number.isFinite(v);   // vecteur propre : null hors de la plus grande composante
+const fmt = (v, k) => !ok(v) ? "n/d" : k === "deg" ? String(v) : k === "force" ? v.toFixed(1) : v.toFixed(3);
+
+const $ = id => document.getElementById(id);
+const cv = $("cv"), ctx = cv.getContext("2d"), stage = $("stage"), tip = $("tip");
+
+const S = { key: "ingredients", size: "force", color: "c", bridgesOnly: false, hidden: new Set(),
+            sel: null, hover: null, view: { k: 1, x: 0, y: 0 }, W: 0, H: 0 };
+const G = {};   // prepared graphs
+
+for (const key of Object.keys(DATA)) {
+  const d = DATA[key];
+  const byId = new Map(d.nodes.map(n => [n.id, n]));
+  const ranks = {};
+  for (const m of Object.keys(METRICS)) {
+    const sorted = [...d.nodes].sort((a, b) => (ok(b[m]) ? b[m] : -1e9) - (ok(a[m]) ? a[m] : -1e9));
+    ranks[m] = new Map(sorted.map((n, i) => [n.id, i + 1]));
+  }
+  const edges = d.edges.map(([u, v, w]) => [byId.get(u), byId.get(v), w]);
+  const wmax = Math.max(...d.edges.map(e => e[2])), wmin = Math.min(...d.edges.map(e => e[2]));
+  const xs = d.nodes.map(n => n.x), ys = d.nodes.map(n => n.y);
+  G[key] = { ...d, byId, ranks, edges, wmax, wmin,
+             bounds: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] };
+}
+
+/* ---------- colours from the theme ---------- */
+let T = {};
+function readTheme() {
+  const cs = getComputedStyle(document.documentElement);
+  for (const k of ["bg", "surface", "ink", "ink-2", "ink-3", "line", "edge", "accent"]) T[k] = cs.getPropertyValue("--" + k).trim();
+}
+readTheme();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { readTheme(); draw(); });
+new MutationObserver(() => { readTheme(); draw(); }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+const g = () => G[S.key];
+function groupOf(n) { return S.key === "pays" && S.color === "region" ? n.region : n.c; }
+function colorOf(n) {
+  if (S.key === "pays" && S.color === "region") return (REGIONS[n.region] || ["", "#999"])[1];
+  return PALETTE[n.c % PALETTE.length];
+}
+function visible(n) {
+  if (S.hidden.has(groupOf(n))) return false;
+  if (S.bridgesOnly && S.key === "ingredients" && !n.broker) return false;
+  return true;
+}
+function radius(n) {
+  const gr = g(); const m = S.size;
+  if (!gr._max) gr._max = {};
+  if (gr._max[m] === undefined) gr._max[m] = Math.max(...gr.nodes.filter(x => ok(x[m])).map(x => x[m])) || 1;
+  const base = S.key === "ingredients" ? 2.5 : 3;
+  const span = S.key === "ingredients" ? 11 : 12;
+  const v = ok(n[m]) ? n[m] : 0;   // valeur absente : plus petit rayon
+  return (base + span * Math.sqrt(v / gr._max[m])) * Math.pow(S.view.k, 0.35);
+}
+
+/* ---------- view ---------- */
+function fit() {
+  const [x0, y0, x1, y1] = g().bounds, pad = 40;
+  const k = Math.min((S.W - 2 * pad) / ((x1 - x0) || 1), (S.H - 2 * pad - (S.key === "pays" ? 20 : 0)) / ((y1 - y0) || 1));
+  S.view = { k: 1, x: 0, y: 0, base: k, ox: pad + (S.W - 2 * pad - k * (x1 - x0)) / 2 - k * x0, oy: pad + (S.H - 2 * pad - k * (y1 - y0)) / 2 - k * y0 };
+}
+const sx = n => (S.view.ox + S.view.base * n.x) * S.view.k + S.view.x;
+const sy = n => (S.view.oy + S.view.base * n.y) * S.view.k + S.view.y;
+
+function resize() {
+  const r = stage.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+  const first = !S.W;
+  S.W = r.width; S.H = r.height;
+  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (first || !S.view.base) fit(); else { const keep = { k: S.view.k, x: S.view.x, y: S.view.y }; fit(); Object.assign(S.view, keep); }
+  draw();
+}
+new ResizeObserver(resize).observe(stage);
+
+function zoomAt(f, px, py) {
+  const k2 = Math.min(12, Math.max(0.5, S.view.k * f)); f = k2 / S.view.k;
+  S.view.x = px - (px - S.view.x) * f; S.view.y = py - (py - S.view.y) * f; S.view.k = k2; draw();
+}
+
+/* ---------- drawing ---------- */
+function label(text, x, y, bold, color) {
+  ctx.font = `${bold ? 700 : 500} ${bold ? 13 : 12}px "Alegreya Sans", "Segoe UI", system-ui, sans-serif`;
+  const w = ctx.measureText(text).width;
+  ctx.globalAlpha = 0.82; ctx.fillStyle = T.surface;
+  ctx.beginPath(); ctx.roundRect(x - w / 2 - 4, y - 8, w + 8, 16, 4); ctx.fill();
+  ctx.globalAlpha = 1; ctx.fillStyle = color || T.ink; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(text, x, y + 0.5);
+}
+
+function draw() {
+  if (!S.W) return;
+  const gr = g();
+  ctx.clearRect(0, 0, S.W, S.H);
+  ctx.fillStyle = T.surface; ctx.fillRect(0, 0, S.W, S.H);
+  const sel = S.sel && gr.byId.get(S.sel);
+  const focus = sel ? new Set([sel.id, ...sel.nb.map(x => x[0])]) : null;
+  const q = $("q").value.trim().toLowerCase();
+
+  // edges of the backbone
+  const span = (gr.wmax - gr.wmin) || 1;
+  for (const [a, b, w] of gr.edges) {
+    if (!visible(a) || !visible(b)) continue;
+    const t = (w - gr.wmin) / span;
+    let alpha = 0.06 + 0.16 * t;
+    if (focus) alpha *= 0.35;
+    ctx.strokeStyle = `rgba(${T.edge}, ${alpha})`;
+    ctx.lineWidth = 0.5 + 1.3 * t;
+    ctx.beginPath(); ctx.moveTo(sx(a), sy(a)); ctx.lineTo(sx(b), sy(b)); ctx.stroke();
+  }
+  // strongest links of the selected node (full graph)
+  if (sel) {
+    const top = sel.nb[0] ? sel.nb[0][1] : 1;
+    for (const [id, w] of sel.nb) {
+      const o = gr.byId.get(id); if (!o) continue;
+      ctx.strokeStyle = colorOf(sel); ctx.globalAlpha = 0.85; ctx.lineWidth = 1 + 3 * (w / top);
+      ctx.beginPath(); ctx.moveTo(sx(sel), sy(sel)); ctx.lineTo(sx(o), sy(o)); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  // nodes (small first so big ones sit on top)
+  const order = [...gr.nodes].sort((a, b) => a[S.size] - b[S.size]);
+  for (const n of order) {
+    if (!visible(n)) continue;
+    const x = sx(n), y = sy(n), r = radius(n);
+    if (x < -30 || y < -30 || x > S.W + 30 || y > S.H + 30) continue;
+    ctx.globalAlpha = focus && !focus.has(n.id) ? 0.18 : 1;
+    ctx.fillStyle = colorOf(n);
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+    ctx.lineWidth = 1; ctx.strokeStyle = T.surface; ctx.stroke();
+    if (n.broker) { ctx.lineWidth = 2; ctx.strokeStyle = T.ink; ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+  }
+  if (sel) {
+    ctx.lineWidth = 2.5; ctx.strokeStyle = T.accent;
+    ctx.beginPath(); ctx.arc(sx(sel), sy(sel), radius(sel) + 6, 0, 7); ctx.stroke();
+  }
+  // isolated-countries caption
+  if (S.key === "pays") {
+    const rest = gr.nodes.filter(n => !n.lcc);
+    if (rest.length) {
+      ctx.font = 'italic 13px "Alegreya Sans", system-ui, sans-serif'; ctx.fillStyle = T["ink-3"];
+      ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+      ctx.fillText("Hors de la plus grande composante :", sx(rest[0]) - 20, sy(rest[0]) - 16);
+    }
+  }
+  // labels
+  let names;
+  if (focus) names = [...focus];
+  else {
+    const vis = gr.nodes.filter(visible);
+    const nTop = Math.round((S.key === "ingredients" ? 14 : 12) * Math.min(3, S.view.k));
+    names = [...vis].sort((a, b) => b[S.size] - a[S.size]).slice(0, nTop).map(n => n.id);
+    if (S.key === "ingredients") names.push(...vis.filter(n => n.broker).map(n => n.id));
+    if (S.key === "pays") names.push(...vis.filter(n => !n.lcc).map(n => n.id));
+  }
+  if (q) names.push(...gr.nodes.filter(n => visible(n) && n.id.toLowerCase().includes(q)).slice(0, 20).map(n => n.id));
+  for (const id of new Set(names)) {
+    const n = gr.byId.get(id); if (!n || !visible(n)) continue;
+    const below = S.key === "pays" && !n.lcc;
+    label(short(n.id), sx(n), sy(n) + (below ? radius(n) + 12 : -radius(n) - 9), n.broker || id === S.sel);
+  }
+  if (S.hover && S.hover !== S.sel) {
+    const n = gr.byId.get(S.hover);
+    if (n) { ctx.lineWidth = 2; ctx.strokeStyle = T.ink; ctx.beginPath(); ctx.arc(sx(n), sy(n), radius(n) + 2, 0, 7); ctx.stroke(); }
+  }
+}
+
+/* ---------- hit testing & pointer ---------- */
+function hit(px, py) {
+  let best = null, bd = Infinity;
+  for (const n of g().nodes) {
+    if (!visible(n)) continue;
+    const d = Math.hypot(sx(n) - px, sy(n) - py), r = Math.max(radius(n), 7) + 3;
+    if (d < r && d < bd) { bd = d; best = n; }
+  }
+  return best;
+}
+const ptrs = new Map(); let drag = null, moved = false, pinch = null;
+cv.addEventListener("pointerdown", e => {
+  cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, [e.offsetX, e.offsetY]); moved = false;
+  if (ptrs.size === 1) drag = { x: e.offsetX, y: e.offsetY, vx: S.view.x, vy: S.view.y };
+  if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), k: S.view.k }; drag = null; }
+});
+cv.addEventListener("pointermove", e => {
+  if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, [e.offsetX, e.offsetY]);
+  if (pinch && ptrs.size === 2) {
+    const [a, b] = [...ptrs.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    zoomAt((pinch.k * d / pinch.d) / S.view.k, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2); moved = true; return;
+  }
+  if (drag) {
+    const dx = e.offsetX - drag.x, dy = e.offsetY - drag.y;
+    if (Math.abs(dx) + Math.abs(dy) > 3) { moved = true; cv.classList.add("dragging"); }
+    if (moved) { S.view.x = drag.vx + dx; S.view.y = drag.vy + dy; tip.hidden = true; draw(); }
+    return;
+  }
+  if (e.pointerType === "mouse") {
+    const n = hit(e.offsetX, e.offsetY);
+    const id = n ? n.id : null;
+    if (id !== S.hover) { S.hover = id; draw(); }
+    if (n) showTip(n, e.offsetX, e.offsetY); else tip.hidden = true;
+  }
+});
+function endPtr(e) {
+  ptrs.delete(e.pointerId); cv.classList.remove("dragging");
+  if (ptrs.size < 2) pinch = null;
+  if (drag && !moved) { const n = hit(e.offsetX, e.offsetY); select(n ? n.id : null); }
+  drag = null;
+}
+cv.addEventListener("pointerup", endPtr);
+cv.addEventListener("pointercancel", e => { ptrs.delete(e.pointerId); drag = null; pinch = null; });
+cv.addEventListener("pointerleave", () => { if (S.hover) { S.hover = null; draw(); } tip.hidden = true; });
+cv.addEventListener("wheel", e => { e.preventDefault(); zoomAt(Math.exp(-e.deltaY * 0.0015), e.offsetX, e.offsetY); }, { passive: false });
+$("zin").onclick = () => zoomAt(1.4, S.W / 2, S.H / 2);
+$("zout").onclick = () => zoomAt(1 / 1.4, S.W / 2, S.H / 2);
+$("zfit").onclick = () => { fit(); draw(); };
+
+function groupName(n) {
+  if (S.key === "pays" && S.color === "region") return (REGIONS[n.region] || [n.region])[0];
+  return "Community " + n.c;
+}
+function showTip(n, x, y) {
+  const extra = S.key === "ingredients" ? `${n.nrec.toLocaleString("en-US")} recipes` : `${(REGIONS[n.region] || [n.region])[0]} · ${n.ning} ingredients`;
+  tip.innerHTML = `<b>${esc(n.id)}</b>${n.broker ? " · broker" : ""}<br>${esc(groupName(n))} · ${extra}<br>` +
+    `<span class="m">${METRICS[S.size]} ${fmt(n[S.size], S.size)} (rank ${g().ranks[S.size].get(n.id)}/${g().nodes.length})</span>`;
+  tip.hidden = false;
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = Math.min(x + 14, S.W - w - 8) + "px";
+  tip.style.top = (y + 14 + h > S.H ? y - h - 10 : y + 14) + "px";
+}
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+/* ---------- panel ---------- */
+function select(id) { S.sel = id; S.hover = null; tip.hidden = true; renderPanel(); draw(); }
+
+function renderPanel() {
+  const gr = g(), p = $("panel");
+  const n = S.sel && gr.byId.get(S.sel);
+  if (!n) { p.innerHTML = summaryHTML(); bindPanel(); return; }
+  const N = gr.nodes.length;
+  const rows = Object.keys(METRICS).map(m =>
+    `<tr><td>${METRICS[m]}</td><td class="v">${fmt(n[m], m)}</td><td class="r">${gr.ranks[m].get(n.id)} / ${N}</td></tr>`).join("");
+  const top = n.nb.length ? n.nb[0][1] : 1;
+  const nbs = n.nb.map(([id, w]) => {
+    const o = gr.byId.get(id);
+    return `<li><button data-go="${esc(id)}"><span class="dot" style="background:${colorOf(o)}"></span>` +
+      `<span class="name">${esc(short(id))}</span><span class="bar"><i style="width:${Math.round(100 * w / top)}%"></i></span>` +
+      `<span class="w">${w.toFixed(2)}</span></button></li>`;
+  }).join("");
+  const meta = S.key === "ingredients"
+    ? `Category: ${esc(n.cat || "—")} · in ${n.nrec.toLocaleString("en-US")} recipes`
+    : `${esc(n.sub)} · ${n.ning} ingredients across the dishes${n.lcc ? "" : " · outside the largest connected component"}`;
+  p.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <h2>${esc(n.id)}</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span class="badge"><span class="dot" style="background:${PALETTE[n.c % PALETTE.length]}"></span>Community ${n.c}</span>
+        ${S.key === "pays" ? `<span class="badge"><span class="dot" style="background:${(REGIONS[n.region] || ["", "#999"])[1]}"></span>${(REGIONS[n.region] || [n.region])[0]}</span>` : ""}
+        ${n.broker ? `<span class="bridge-tag">Broker: top 10 hop betweenness</span>` : ""}
+      </div>
+      <p>${meta}</p>
+    </div>
+    <div><h3>Measures (full graph)</h3><table>${rows}</table></div>
+    <div><h3>Strongest links (${gr.weight_label})</h3><ul class="nb">${nbs}</ul></div>
+    <button class="ghost" id="clear">Clear selection</button>`;
+  bindPanel();
+}
+
+function summaryHTML() {
+  const gr = g();
+  const comms = gr.communities.map(c =>
+    `<li><span style="color:${PALETTE[c.id % PALETTE.length]}">●</span> <b>C${c.id}</b> (${c.size}) : ${c.top.map(t => `<button class="link" data-go="${esc(t)}">${esc(short(t))}</button>`).join(", ")}</li>`).join("");
+  const key = S.key === "ingredients";
+  const link = n => `<button class="link" data-go="${esc(n.id)}">${esc(short(n.id))}</button>`;
+  const topHop = [...gr.nodes].sort((a, b) => b.btw - a.btw).slice(0, 5).map(link).join(", ");
+  const topW = [...gr.nodes].sort((a, b) => b.btw2 - a.btw2).slice(0, 5).map(link).join(", ");
+  return `
+    <div><h3>${key ? "Ingredient graph" : "Country graph"}</h3>
+      <p>${key ? "Two ingredients are linked if they appear together in recipes more often than chance predicts (PMI)."
+               : "Two countries are linked if their dishes share enough ingredients (Jaccard ≥ 0.3)."}</p></div>
+    <div class="stats">
+      <div class="stat"><div class="k">Nodes</div><div class="v">${gr.n_nodes}</div></div>
+      <div class="stat"><div class="k">Edges</div><div class="v">${gr.n_edges.toLocaleString("en-US")}</div></div>
+    </div>
+    <div><h3>Highest hop betweenness</h3><p>${topHop}</p></div>
+    <div><h3>Highest betweenness with distance 1/${gr.weight_label}</h3><p>${topW}</p></div>
+    <div><h3>Communities (Louvain)</h3><ul class="list">${comms}</ul></div>
+    <p style="font-size:14px">Click a node to see its measures and strongest links. Drag to pan, scroll or pinch to zoom.</p>`;
+}
+function bindPanel() {
+  $("panel").querySelectorAll("[data-go]").forEach(b => b.onclick = () => select(b.dataset.go));
+  const c = $("clear"); if (c) c.onclick = () => select(null);
+}
+
+/* ---------- legend, controls, tabs ---------- */
+function renderLegend() {
+  const gr = g(), L = $("legend");
+  let groups;
+  if (S.key === "pays" && S.color === "region")
+    groups = Object.entries(REGIONS).map(([k, [name, col]]) => ({ id: k, name, col, n: gr.nodes.filter(n => n.region === k).length }));
+  else groups = gr.communities.map(c => ({ id: c.id, name: `C${c.id} · ${c.top.slice(0, 2).map(short).join(", ")}`, col: PALETTE[c.id % PALETTE.length], n: c.size }));
+  L.innerHTML = groups.map(x =>
+    `<button class="chip" data-g="${esc(x.id)}" aria-pressed="${!S.hidden.has(x.id)}"><span class="dot" style="background:${x.col}"></span>${esc(x.name)}<span class="n">${x.n}</span></button>`).join("");
+  L.querySelectorAll(".chip").forEach(b => b.onclick = () => {
+    const id = groups.find(x => String(x.id) === b.dataset.g).id;
+    S.hidden.has(id) ? S.hidden.delete(id) : S.hidden.add(id);
+    b.setAttribute("aria-pressed", String(!S.hidden.has(id))); draw();
+  });
+}
+function setKey(key) {
+  S.key = key; S.sel = null; S.hover = null; S.hidden.clear(); $("q").value = "";
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.key === key)));
+  $("color-field").hidden = key !== "pays"; $("bridges-field").hidden = key !== "ingredients";
+  const gr = g();
+  $("sub").textContent = key === "ingredients"
+    ? "Which ingredients connect culinary traditions?"
+    : "Does culinary proximity follow geography?";
+  $("note").textContent = `Drawn: the strongest edges of each node (${gr.n_shown.toLocaleString("en-US")} of ${gr.n_edges.toLocaleString("en-US")}). Measures use the full graph.`;
+  $("foot").textContent = `Source: ${gr.source}. Same colours as the report figures.`;
+  $("names").innerHTML = gr.nodes.map(n => `<option value="${esc(n.id)}"></option>`).join("");
+  fit(); renderLegend(); renderPanel(); draw();
+}
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => setKey(b.dataset.key));
+$("size").onchange = e => { S.size = e.target.value; draw(); if (S.sel) renderPanel(); };
+$("color").onchange = e => { S.color = e.target.value; S.hidden.clear(); renderLegend(); draw(); };
+$("bridges").onchange = e => { S.bridgesOnly = e.target.checked; draw(); };
+$("q").addEventListener("input", () => {
+  const v = $("q").value.trim(), n = g().byId.get(v) || [...g().byId.values()].find(x => x.id.toLowerCase() === v.toLowerCase());
+  if (n) select(n.id); else draw();
+});
+$("q").addEventListener("keydown", e => {
+  if (e.key !== "Enter") return;
+  const v = $("q").value.trim().toLowerCase(); if (!v) return;
+  const n = g().nodes.find(x => x.id.toLowerCase().startsWith(v)) || g().nodes.find(x => x.id.toLowerCase().includes(v));
+  if (n) select(n.id);
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && S.sel) select(null); });
+
+setKey("ingredients");
+</script>

@@ -1,25 +1,27 @@
-"""Test de robustesse du graphe d'ingredients.
+"""Removal experiments on the ingredient graph (repository only, not in the report).
 
-Question : retirer les ingredients « ponts » (participation / intermediarite
-elevees) deconnecte-t-il les cuisines davantage que retirer les ingredients
-les plus frequents ou les plus connectes ? Si oui, le graphe voit une
-structure que les simples frequences ne voient pas.
+Question: does removing the ingredients with the highest participation coefficient or
+betweenness disconnect the cuisines more than removing frequent ingredients?
 
-Strategies (classement fige sur le graphe d'origine, k ingredients retires) :
-  - participation : coefficient de participation (ingredients de degre >= 20)
-  - intermediarite : centralite d'intermediarite (distance = 1/poids)
-  - frequence : nombre de recettes contenant l'ingredient
-  - degre : nombre de voisins
-  - aleatoire : moyenne de 20 tirages (baseline)
+Strategies (ranking fixed on the original graph, k ingredients removed):
+  - participation: participation coefficient (ingredients of degree >= 20)
+  - betweenness_hop: hop betweenness (primary broker measure)
+  - betweenness_pmi: betweenness with distance 1/PMI (sensitivity)
+  - frequency: number of recipes containing the ingredient
+  - degree: number of neighbours
+  - random: mean of 20 draws (baseline)
 
-Metriques apres retrait :
-  - lcc_frac : part des noeuds restants dans la plus grande composante
-  - efficacite : efficacite globale (non ponderee)
-  - arêtes inter-communautes : part du poids des aretes restantes qui relient
-    deux communautes de la partition ORIGINALE (mesure les ponts perdus)
-  - modularite : Louvain recalcule sur le graphe restant
+Metrics after removal:
+  - lcc_frac: share of the remaining nodes in the largest component
+  - efficiency: global efficiency (unweighted)
+  - inter_community_weight: share of the remaining edge weight joining two communities of
+    the ORIGINAL partition (partly circular for the participation strategy, which is
+    defined with the same partition)
+  - modularity: Louvain recomputed on the remaining graph
 
-Usage : python src/robustness.py
+The modularity of the random baseline is computed on all 20 draws.
+
+Usage: python src/robustness.py
 """
 from pathlib import Path
 
@@ -37,7 +39,7 @@ import build_graphs as bg
 OUT = Path(__file__).resolve().parent.parent / "outputs"
 KS = [0, 5, 10, 15, 20, 30, 40, 60]
 N_RANDOM = 20
-MIN_DEGREE_BRIDGE = 20
+MIN_DEGREE_PARTICIPATION = 20
 SEED = 42
 
 
@@ -64,48 +66,48 @@ def cross_share(G, comm):
     return cross / tot if tot else 0.0
 
 
-def evaluate(G0, removed, comm, with_louvain=True):
+def evaluate(G0, removed, comm):
     G = G0.copy()
     G.remove_nodes_from(removed)
     eff, lcc = efficiency_and_lcc(G)
-    row = {"efficacite": eff, "lcc_frac": lcc, "inter_communautes": cross_share(G, comm)}
-    if with_louvain:
-        part = nx.community.louvain_communities(G, weight="weight", seed=SEED)
-        row["modularite"] = nx.community.modularity(G, part, weight="weight")
-    return row
+    part = nx.community.louvain_communities(G, weight="weight", seed=SEED)
+    return {"efficiency": eff, "lcc_frac": lcc,
+            "inter_community_weight": cross_share(G, comm),
+            "modularity": nx.community.modularity(G, part, weight="weight")}
 
 
 def run(G, tag):
-    part = nx.community.louvain_communities(G, weight="weight", seed=SEED)
-    comm = {n: i for i, c in enumerate(part) for n in c}
+    part = an.louvain_partition(G)
+    comm = an.community_map(part)
     pc = an.participation(G, part)
     H = G.copy()
     for u, v, d in H.edges(data=True):
         d["dist"] = 1.0 / d["weight"]
-    bet = nx.betweenness_centrality(H, weight="dist")
+    bet_hop = nx.betweenness_centrality(G)
+    bet_pmi = nx.betweenness_centrality(H, weight="dist")
 
-    cand = [n for n in G if G.degree(n) >= MIN_DEGREE_BRIDGE]
+    cand = [n for n in G if G.degree(n) >= MIN_DEGREE_PARTICIPATION]
     ranks = {
         "participation": sorted(cand, key=lambda n: pc[n], reverse=True),
-        "intermediarite": sorted(G, key=lambda n: bet[n], reverse=True),
-        "frequence": sorted(G, key=lambda n: G.nodes[n]["n_recipes"], reverse=True),
-        "degre": sorted(G, key=lambda n: G.degree(n), reverse=True),
+        "betweenness_hop": sorted(G, key=lambda n: bet_hop[n], reverse=True),
+        "betweenness_pmi": sorted(G, key=lambda n: bet_pmi[n], reverse=True),
+        "frequency": sorted(G, key=lambda n: G.nodes[n]["n_recipes"], reverse=True),
+        "degree": sorted(G, key=lambda n: G.degree(n), reverse=True),
     }
 
-    # recouvrement des 20 premiers : les ponts sont-ils juste les plus frequents ?
+    # overlap of the top 20 with the top 20 by frequency
     top = {k: set(v[:20]) for k, v in ranks.items()}
-    print(f"\n[{tag}] recouvrement top-20 (Jaccard) avec 'frequence' :")
-    for k in ("participation", "intermediarite", "degre"):
-        j = len(top[k] & top["frequence"]) / len(top[k] | top["frequence"])
+    print(f"\n[{tag}] top-20 overlap (Jaccard) with 'frequency':")
+    for k in ("participation", "betweenness_hop", "betweenness_pmi", "degree"):
+        j = len(top[k] & top["frequency"]) / len(top[k] | top["frequency"])
         print(f"  {k}: {j:.2f}")
-    print(f"  top-10 participation : {ranks['participation'][:10]}")
-    print(f"  top-10 intermediarite : {ranks['intermediarite'][:10]}")
-    print(f"  top-10 frequence : {ranks['frequence'][:10]}")
+    for k in ("participation", "betweenness_hop", "betweenness_pmi", "frequency"):
+        print(f"  top-10 {k}: {ranks[k][:10]}")
 
     rows = []
     for strat, order in ranks.items():
         for k in KS:
-            rows.append({"strategie": strat, "k": k, **evaluate(G, order[:k], comm)})
+            rows.append({"strategy": strat, "k": k, **evaluate(G, order[:k], comm)})
 
     rng = np.random.default_rng(SEED)
     nodes = list(G)
@@ -113,40 +115,42 @@ def run(G, tag):
     for r in range(N_RANDOM):
         perm = list(rng.permutation(nodes))
         for k in KS:
-            rand.append({"run": r, "k": k, **evaluate(G, perm[:k], comm, with_louvain=(r < 8))})
+            rand.append({"run": r, "k": k, **evaluate(G, perm[:k], comm)})
     rd = pd.DataFrame(rand).groupby("k").agg(["mean", "std"])
     for k in KS:
-        rows.append({"strategie": "aleatoire", "k": k,
-                     "efficacite": rd.loc[k, ("efficacite", "mean")],
+        rows.append({"strategy": "random", "k": k,
+                     "efficiency": rd.loc[k, ("efficiency", "mean")],
                      "lcc_frac": rd.loc[k, ("lcc_frac", "mean")],
-                     "inter_communautes": rd.loc[k, ("inter_communautes", "mean")],
-                     "modularite": rd.loc[k, ("modularite", "mean")],
-                     "efficacite_std": rd.loc[k, ("efficacite", "std")],
-                     "inter_std": rd.loc[k, ("inter_communautes", "std")]})
+                     "inter_community_weight": rd.loc[k, ("inter_community_weight", "mean")],
+                     "modularity": rd.loc[k, ("modularity", "mean")],
+                     "efficiency_std": rd.loc[k, ("efficiency", "std")],
+                     "inter_community_std": rd.loc[k, ("inter_community_weight", "std")],
+                     "modularity_std": rd.loc[k, ("modularity", "std")],
+                     "n_random_draws": N_RANDOM})
     df = pd.DataFrame(rows)
     df.to_csv(OUT / f"robustesse_{tag}.csv", index=False)
 
-    # figure
-    metrics = [("efficacite", "Efficacité globale"), ("lcc_frac", "Part de la plus grande composante"),
-               ("inter_communautes", "Poids des arêtes inter-communautés"), ("modularite", "Modularité (Louvain)")]
+    metrics = [("efficiency", "Global efficiency"), ("lcc_frac", "Share in the largest component"),
+               ("inter_community_weight", "Inter-community edge weight"), ("modularity", "Modularity (Louvain)")]
     fig, axes = plt.subplots(1, 4, figsize=(18, 4))
-    colors = {"participation": "#d62728", "intermediarite": "#ff7f0e", "frequence": "#1f77b4",
-              "degre": "#2ca02c", "aleatoire": "#7f7f7f"}
+    colors = {"participation": "#d62728", "betweenness_hop": "#ff7f0e", "betweenness_pmi": "#9467bd",
+              "frequency": "#1f77b4", "degree": "#2ca02c", "random": "#7f7f7f"}
     for ax, (m, title) in zip(axes, metrics):
         for s, c in colors.items():
-            d = df[df.strategie == s]
-            ax.plot(d.k, d[m], marker="o", ms=3, label=s, color=c, ls="--" if s == "aleatoire" else "-")
+            d = df[df.strategy == s]
+            ax.plot(d.k, d[m], marker="o", ms=3, label=s, color=c, ls="--" if s == "random" else "-")
         ax.set_title(title, fontsize=10)
-        ax.set_xlabel("Ingrédients retirés (k)")
+        ax.set_xlabel("Ingredients removed (k)")
     axes[0].legend(fontsize=8)
-    fig.suptitle(f"Robustesse du graphe d'ingrédients — {tag} ({G.number_of_nodes()} nœuds, {G.number_of_edges()} arêtes)")
+    fig.suptitle(f"Removal experiments, ingredient graph: {tag} ({G.number_of_nodes()} nodes, "
+                 f"{G.number_of_edges()} edges; random = mean of {N_RANDOM} draws)")
     fig.tight_layout()
     fig.savefig(OUT / f"robustesse_{tag}.png", dpi=130)
     plt.close(fig)
 
-    piv = df.pivot(index="k", columns="strategie")
-    for m in ("efficacite", "inter_communautes", "lcc_frac", "modularite"):
-        print(f"\n[{tag}] {m} :\n", piv[m].round(3))
+    piv = df.pivot(index="k", columns="strategy")
+    for m in ("efficiency", "inter_community_weight", "lcc_frac", "modularity"):
+        print(f"\n[{tag}] {m}:\n", piv[m].round(3))
     return df
 
 

@@ -1,0 +1,3 @@
+graph,n_seeds,communities_min,communities_max,communities_most_frequent,runs_with_most_frequent,modularity_min,modularity_max,modularity_mean,recurring_groups,nodes_in_recurring_groups,nodes_without_recurring_group,reference_seed_communities,reference_seed_modularity
+ingredients,30,4,6,5,28,0.3892268204439951,0.401870224793178,0.39804270256051727,13,349,13,5,0.3999815366926099
+countries,30,9,11,11,21,0.2706199551961956,0.28820093366505517,0.282195067148549,14,154,17,11,0.28576217397710685

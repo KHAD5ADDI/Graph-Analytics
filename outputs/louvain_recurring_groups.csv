@@ -1,0 +1,28 @@
+graph,group,size,min_share_of_seeds,strongest_members
+ingredients,0,109,0.9,Shallot; Laurel; Carrot; Celery; Thyme; Parsley; Mushroom; Tomato Paste; White Wine; Chicken
+ingredients,1,95,0.9,Cinnamon; Vanilla; Coconut; Orange; Nutmeg; Raisin; Sugar; Honey; Chocolate; Baking Powder
+ingredients,2,44,0.9,Ginger; Welsh onion; Fish; Soybean Sauce; Lime; Sesame; Coconut Milk; Rice; Vinegar; Cucumber
+ingredients,3,43,0.9,Coriander; Turmeric; Clove; Cumin; Fennel; Chickpea; Cayenne; Peas; Capsicum; Sunflower
+ingredients,4,39,0.9,Lettuce; Mustard; Beans; Mayonnaise; Worcestershite Sauce; Avocado; Jalapeno; Ketchup; Dill; Apple Cider Vinegar
+ingredients,5,3,0.9,Watercress; Blue Cheese; Endive
+ingredients,6,3,0.9,Beef; Turkey; Kidney Beans
+ingredients,7,3,0.9,Canola Oil; Brown Rice; French plantain
+ingredients,8,2,0.9,Port Wine; Lard
+ingredients,9,2,0.9,Gruyere Cheese; Macaroni
+ingredients,10,2,0.9,Ham; Black-eyed pea
+ingredients,11,2,0.9,Redskin onion; Quinoa
+ingredients,12,2,0.9,Crab; Old Bay Seasoning
+countries,0,43,0.9,"New Zealand; Malta; Bosnia and Herzegovina; Poland; Moldova, Rep.of; Slovakia; France; Georgia; Belarus; Portugal"
+countries,1,28,0.9,Burkina Faso; Mauritius; Gambia; Central African Republic; Republic of the Congo; Roumania; Niger; Senegal; Gabon; Guinea-Bissau
+countries,2,27,0.9,Kyrgyzstan; Cyprus; Saudi Arabia; Sudan; Kuwait; Djibouti; United Arab Emirates; Yemen; Tunisia; Egypt
+countries,3,18,0.9,"Uganda; Saint Kitts and Nevis; Saint Vincent and the Grenadines; Fiji; Jamaica; Tanzania, United Rep. of; Antigua and Barbuda; Saint Lucia; Bahamas; Guyana"
+countries,4,10,0.9,Guinea; Costa Rica; Honduras; Equatorial Guinea; Colombia; Spain; Belize; Dominican Republic; Guatemala; Nicaragua
+countries,5,6,0.9,Tonga; Kiribati; Comoros; Solomon Islands; Vanuatu; Samoa
+countries,6,5,0.9,Lao People's Democratic Republic; Singapore; Thailand; Viet Nam; Cambodia
+countries,7,3,0.9,Turkey; Albania; Bulgaria
+countries,8,3,0.9,"Korea, Rep. of Korea; China; Japan"
+countries,9,3,0.9,Micronesia (Federated States of); Seychelles; Palau
+countries,10,2,0.9,El Salvador; Ecuador
+countries,11,2,0.9,Kazakstan; Italy
+countries,12,2,0.9,Panama; Suriname
+countries,13,2,0.9,Zambia; Zimbabwe

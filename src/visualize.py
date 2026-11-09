@@ -1,17 +1,19 @@
-"""Visualisations reseau des deux graphes (figures du rapport).
+"""Network figures of the two graphs (report figures).
 
-Sorties (outputs/) :
-  - fig_ingredients.png : graphe d'ingredients, couleur = communaute Louvain,
-    taille = force (somme des PMI), anneau noir + etiquette = ingredients « ponts »
-    (coefficient de participation le plus eleve parmi les ingredients de degre >= 20)
-  - fig_pays.png : graphe des pays, a gauche communautes Louvain,
-    a droite regions de l'ONU (meme disposition pour comparer)
+Outputs (outputs/):
+  - fig_ingredients.png: ingredient graph, colour = Louvain community, size = strength
+    (sum of PMI), black ring + label = the 10 ingredients with the highest hop
+    betweenness ("brokers", the primary measure). Labels: the 4 strongest ingredients
+    of each of the 6 largest communities.
+  - fig_pays.png: country graph, Louvain communities on the left, UN regions on the
+    right (same layout, to compare them)
 
-Pour la lisibilite, seules les aretes les plus fortes de chaque noeud sont
-dessinees et servent a la disposition (squelette). Toutes les mesures du
-rapport sont calculees sur le graphe complet.
+For readability only the strongest edges of each node are drawn and used for the
+layout (a backbone). All measures in the report are computed on the full graphs.
+Node positions come from a force-directed layout and have no geographic meaning.
+Communities are numbered by decreasing size (see analyze.louvain_partition).
 
-Usage : python src/visualize.py
+Usage: python src/visualize.py   (needs outputs/geo_pays_communautes.csv from geography.py)
 """
 from pathlib import Path
 
@@ -27,12 +29,13 @@ import build_graphs as bg
 
 OUT = Path(__file__).resolve().parent.parent / "outputs"
 SEED = 42
+N_BROKERS = 10
 PALETTE = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc948",
            "#b07aa1", "#ff9da7", "#9c755f", "#bab0ac", "#86bcb6", "#d37295"]
 
 
 def backbone(G, k):
-    """Union des k aretes les plus fortes de chaque noeud (pour affichage)."""
+    """Union of the k strongest edges of each node (display only)."""
     keep = set()
     for n in G:
         nb = sorted(G[n].items(), key=lambda x: x[1]["weight"], reverse=True)[:k]
@@ -69,57 +72,55 @@ def label(ax, pos, nodes, fs=9, weight="normal"):
 def fig_ingredients():
     recipes, pairs, names = bg.load_culinarydb()
     G = bg.build_ingredient_graph(pairs, names)
-    part = sorted(nx.community.louvain_communities(G, weight="weight", seed=SEED), key=len, reverse=True)
-    comm = {n: i for i, c in enumerate(part) for n in c}
-    pc = an.participation(G, part)
+    part = an.louvain_partition(G)
+    comm = an.community_map(part)
     strength = dict(G.degree(weight="weight"))
+    hop = nx.betweenness_centrality(G)
+    brokers = sorted(G, key=lambda n: hop[n], reverse=True)[:N_BROKERS]
 
     B = backbone(G, 6)
     pos = nx.spring_layout(B, weight="weight", k=0.35, iterations=300, seed=SEED)
-
-    bridges = [n for n in sorted((n for n in G if G.degree(n) >= 20), key=lambda n: pc[n], reverse=True)][:12]
     sizes = [30 + 3.0 * strength[n] for n in B]
-    colors = [PALETTE[comm[n]] for n in B]
+    colors = [PALETTE[comm[n] % len(PALETTE)] for n in B]
 
     fig, ax = plt.subplots(figsize=(15, 12))
     draw(ax, G, B, pos, colors, sizes)
-    # anneau noir autour des ponts
-    nx.draw_networkx_nodes(B, pos, nodelist=bridges, ax=ax, node_color="none",
-                           node_size=[30 + 3.0 * strength[n] + 60 for n in bridges],
+    nx.draw_networkx_nodes(B, pos, nodelist=brokers, ax=ax, node_color="none",
+                           node_size=[30 + 3.0 * strength[n] + 60 for n in brokers],
                            edgecolors="black", linewidths=1.8)
     hubs = []
-    for i, c in enumerate(part[:6]):
+    for c in part[:6]:
         hubs += sorted(c, key=lambda n: strength[n], reverse=True)[:4]
-    label(ax, pos, [n for n in dict.fromkeys(hubs) if n not in bridges], fs=9)
-    label(ax, pos, bridges, fs=10, weight="bold")
+    label(ax, pos, [n for n in dict.fromkeys(hubs) if n not in brokers], fs=9)
+    label(ax, pos, brokers, fs=10, weight="bold")
 
     handles = []
     for i, c in enumerate(part[:6]):
         top = ", ".join(sorted(c, key=lambda n: strength[n], reverse=True)[:3])
         handles.append(plt.Line2D([], [], marker="o", ls="", color=PALETTE[i], ms=10,
-                                  label=f"Communauté {i} ({len(c)}) : {top}"))
+                                  label=f"Community {i} ({len(c)} ingredients): {top}"))
     handles.append(plt.Line2D([], [], marker="o", ls="", mfc="none", mec="black", mew=1.8, ms=11,
-                              label="Ingrédient pont (participation élevée)"))
+                              label=f"Broker: top {N_BROKERS} by hop betweenness"))
     ax.legend(handles=handles, loc="lower left", fontsize=10, frameon=True)
-    ax.set_title(f"Graphe des ingrédients — {G.number_of_nodes()} nœuds, {G.number_of_edges()} arêtes "
-                 f"(affichage : {B.number_of_edges()} arêtes les plus fortes)\n"
-                 "Source : CulinaryDB (CoSyLab, IIIT-Delhi)", fontsize=13)
+    ax.set_title(f"Ingredient graph: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges "
+                 f"(drawn: {B.number_of_edges()} edges, the strongest ones of each node)\n"
+                 "Source: CulinaryDB (CoSyLab, IIIT-Delhi)", fontsize=13)
     fig.tight_layout()
     fig.savefig(OUT / "fig_ingredients.png", dpi=150)
     plt.close(fig)
-    print("fig_ingredients.png :", [n for n in bridges])
+    print("fig_ingredients.png, brokers:", brokers)
 
 
 def fig_countries():
     prof = bg.load_country_profiles("all")
     G, _ = bg.build_country_graph(prof)
-    geo = pd.read_csv(OUT / "geo_pays_communautes.csv").set_index("pays")
-    comm = geo["communaute"].to_dict()
+    geo = pd.read_csv(OUT / "geo_pays_communautes.csv", encoding="utf-8-sig").set_index("country")
+    comm = geo["community"].to_dict()
     region = geo["region"].to_dict()
     strength = dict(G.degree(weight="weight"))
 
     B = backbone(G, 5)
-    # disposition sur la plus grande composante ; les pays isoles sont ranges en bas
+    # layout on the largest connected component; the other countries go in a row at the bottom
     comps = sorted(nx.connected_components(B), key=len, reverse=True)
     main = B.subgraph(comps[0])
     pos = nx.spring_layout(main, weight="weight", k=0.22, iterations=500, seed=SEED)
@@ -133,13 +134,13 @@ def fig_countries():
 
     regs = ["Europe", "Asia", "Africa", "Americas", "Oceania"]
     reg_col = dict(zip(regs, ["#4e79a7", "#e15759", "#59a14f", "#f28e2b", "#b07aa1"]))
-    reg_names = {"Europe": "Europe", "Asia": "Asie", "Africa": "Afrique", "Americas": "Amériques", "Oceania": "Océanie"}
 
     fig, axes = plt.subplots(1, 2, figsize=(22, 10))
-    draw(axes[0], G, B, pos, [PALETTE[comm[n]] for n in B], sizes, edge_alpha=0.10)
+    draw(axes[0], G, B, pos, [PALETTE[comm[n] % len(PALETTE)] for n in B], sizes, edge_alpha=0.10)
     draw(axes[1], G, B, pos, [reg_col[region[n]] for n in B], sizes, edge_alpha=0.10)
 
-    big = sorted(set(comm.values()), key=lambda c: -sum(1 for v in comm.values() if v == c))[:6]
+    sizes_c = pd.Series(comm).value_counts()
+    big = list(sizes_c.sort_index().index[:6])   # numbering is by size, so 0..5 are the largest
     hubs = []
     for c in big:
         members = [n for n in G if comm[n] == c and n in main]
@@ -148,27 +149,26 @@ def fig_countries():
     span = max(ys) - min(ys)
     for ax in axes:
         label(ax, pos, hubs, fs=9)
-        for n in rest:   # etiquettes sous les points pour ne pas les cacher
+        for n in rest:   # labels under the points so they do not hide them
             ax.text(pos[n][0], pos[n][1] - 0.035 * span, SHORT.get(n, n), fontsize=8.5, ha="center", va="top")
-        ax.text(min(xs), y0 + 0.06 * span, "Pays hors de la plus grande composante :",
+        ax.text(min(xs), y0 + 0.06 * span, "Countries outside the largest connected component:",
                 fontsize=9, style="italic", ha="left")
         ax.set_ylim(y0 - 0.12 * span, max(ys) + 0.05 * span)
 
-    sizes_c = {c: sum(1 for v in comm.values() if v == c) for c in set(comm.values())}
-    h0 = [plt.Line2D([], [], marker="o", ls="", color=PALETTE[c], ms=10,
-                     label=f"Communauté {c} ({sizes_c[c]})") for c in big]
+    h0 = [plt.Line2D([], [], marker="o", ls="", color=PALETTE[c % len(PALETTE)], ms=10,
+                     label=f"Community {c} ({sizes_c[c]})") for c in big]
     axes[0].legend(handles=h0, loc="upper left", fontsize=10)
-    h1 = [plt.Line2D([], [], marker="o", ls="", color=reg_col[r], ms=10, label=reg_names[r]) for r in regs]
+    h1 = [plt.Line2D([], [], marker="o", ls="", color=reg_col[r], ms=10, label=r) for r in regs]
     axes[1].legend(handles=h1, loc="upper left", fontsize=10)
-    axes[0].set_title("Communautés détectées (Louvain)", fontsize=13)
-    axes[1].set_title("Régions de l'ONU (même disposition)", fontsize=13)
-    fig.suptitle(f"Graphe des pays — {G.number_of_nodes()} nœuds, {G.number_of_edges()} arêtes (Jaccard ≥ {bg.JACCARD_THRESHOLD}) — "
-                 f"affichage : {B.number_of_edges()} arêtes les plus fortes\n"
-                 "Source : Wunderlich & Kohler (2022), EnviDat", fontsize=14)
+    axes[0].set_title("Detected communities (Louvain)", fontsize=13)
+    axes[1].set_title("UN regions (same layout)", fontsize=13)
+    fig.suptitle(f"Country graph: {G.number_of_nodes()} nodes, {G.number_of_edges()} edges "
+                 f"(Jaccard >= {bg.JACCARD_THRESHOLD}), drawn: {B.number_of_edges()} edges, the strongest ones of each node\n"
+                 "Source: Wunderlich & Kohler (2022), EnviDat", fontsize=14)
     fig.tight_layout()
     fig.savefig(OUT / "fig_pays.png", dpi=130)
     plt.close(fig)
-    print("fig_pays.png :", hubs)
+    print("fig_pays.png")
 
 
 if __name__ == "__main__":
