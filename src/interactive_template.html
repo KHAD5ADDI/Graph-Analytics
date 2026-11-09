@@ -1,5 +1,4 @@
 <title>Hidden Bridges of World Cuisines</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@600;700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -177,7 +176,8 @@ const SHORT = { "Saint Vincent and the Grenadines": "St Vincent", "Lao People's 
   "Tanzania, United Rep. of": "Tanzania", "Antigua and Barbuda": "Antigua",
   "Republic of the Congo": "Congo", "United States of America": "USA" };
 const short = s => SHORT[s] || s;
-const fmt = (v, k) => k === "deg" ? String(v) : k === "force" ? v.toFixed(1) : v.toFixed(3);
+const ok = v => typeof v === "number" && Number.isFinite(v);   // vecteur propre : null hors de la plus grande composante
+const fmt = (v, k) => !ok(v) ? "n/d" : k === "deg" ? String(v) : k === "force" ? v.toFixed(1) : v.toFixed(3);
 
 const $ = id => document.getElementById(id);
 const cv = $("cv"), ctx = cv.getContext("2d"), stage = $("stage"), tip = $("tip");
@@ -191,7 +191,7 @@ for (const key of Object.keys(DATA)) {
   const byId = new Map(d.nodes.map(n => [n.id, n]));
   const ranks = {};
   for (const m of Object.keys(METRICS)) {
-    const sorted = [...d.nodes].sort((a, b) => b[m] - a[m]);
+    const sorted = [...d.nodes].sort((a, b) => (ok(b[m]) ? b[m] : -1e9) - (ok(a[m]) ? a[m] : -1e9));
     ranks[m] = new Map(sorted.map((n, i) => [n.id, i + 1]));
   }
   const edges = d.edges.map(([u, v, w]) => [byId.get(u), byId.get(v), w]);
@@ -225,10 +225,11 @@ function visible(n) {
 function radius(n) {
   const gr = g(); const m = S.size;
   if (!gr._max) gr._max = {};
-  if (gr._max[m] === undefined) gr._max[m] = Math.max(...gr.nodes.map(x => x[m])) || 1;
+  if (gr._max[m] === undefined) gr._max[m] = Math.max(...gr.nodes.filter(x => ok(x[m])).map(x => x[m])) || 1;
   const base = S.key === "ingredients" ? 2.5 : 3;
   const span = S.key === "ingredients" ? 11 : 12;
-  return (base + span * Math.sqrt(n[m] / gr._max[m])) * Math.pow(S.view.k, 0.35);
+  const v = ok(n[m]) ? n[m] : 0;   // valeur absente : plus petit rayon
+  return (base + span * Math.sqrt(v / gr._max[m])) * Math.pow(S.view.k, 0.35);
 }
 
 /* ---------- view ---------- */

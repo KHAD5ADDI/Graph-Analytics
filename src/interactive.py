@@ -1,7 +1,8 @@
 """Visualisation interactive des deux graphes (pour l'oral et le README).
 
-Sortie : outputs/graphes_interactifs.html, un fichier autonome (donnees integrees,
-aucune dependance externe) a ouvrir dans un navigateur.
+Sortie : outputs/graphes_interactifs.html, un fichier autonome (donnees et code integres)
+a ouvrir dans un navigateur. Seule la police Google Fonts est chargee en ligne ; hors
+connexion, la page retombe sur une police systeme.
 
 - Onglet Ingredients : couleur = communaute Louvain, anneau = ingredient pont
   (meme definition que fig_ingredients.png : participation la plus elevee
@@ -64,7 +65,9 @@ def node_records(G, measures, comm, pos, extra=None):
         r = {
             "id": n, "x": round(pos[n][0], 4), "y": round(pos[n][1], 4), "c": int(comm[n]),
             "deg": int(m["degre"]), "force": round(float(m["force"]), 2),
-            "btw": round(float(m["intermediarite"]), 4), "eig": round(float(m["vecteur_propre"]), 4),
+            "btw": round(float(m["intermediarite"]), 4),
+            # vecteur propre defini sur la plus grande composante seulement : null ailleurs
+            "eig": None if pd.isna(m["vecteur_propre"]) else round(float(m["vecteur_propre"]), 4),
             "part": round(float(m["participation"]), 3),
             "nb": [[v, round(float(d["weight"]), 3)] for v, d in nb],
         }

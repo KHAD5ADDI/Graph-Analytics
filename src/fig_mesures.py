@@ -45,7 +45,7 @@ def load(name):
 
 
 def bar_panel(ax, s, comm, title, fmt):
-    s = s.sort_values().tail(10)
+    s = s.dropna().sort_values().tail(10)   # vecteur propre : NaN hors de la plus grande composante
     cols = [PALETTE[comm[n] % len(PALETTE)] for n in s.index]
     ax.barh(range(len(s)), s.values, color=cols, height=0.7, edgecolor="white", linewidth=1)
     ax.set_yticks(range(len(s)), [SHORT.get(n, n) for n in s.index])
