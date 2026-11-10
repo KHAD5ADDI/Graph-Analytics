@@ -166,6 +166,8 @@ These stay in the repository and are not part of the report.
 
 [brokers_extra.py](src/brokers_extra.py) writes country centralities, ingredient betweenness-versus-degree rank gaps, a second PMI-distance comparison and summary measures to `outputs/brokers_extra_*.csv` for the report additions.
 
+[cuisine_check.py](src/cuisine_check.py) is an extra check not used in the report, comparing ingredient communities with cuisine labels through occurrence ratios, top and bottom cuisines, a label-shuffle test with a majority baseline, and a slide heatmap (`outputs/cuisine_community_ratio.csv`, `outputs/cuisine_community_top.csv`, `outputs/cuisine_shuffle_test.csv`, `outputs/cuisine_community_heatmap.png`).
+
 ## Results
 
 ### Global measures
@@ -372,6 +374,7 @@ Removal experiments (repository only)
 │   ├── brokers.py                    # ingredient brokers and cut points in both graphs
 │   ├── shuffle_test.py               # country communities vs shuffled UN regions
 │   ├── brokers_extra.py              # country brokers, rank gaps and a second PMI distance
+│   ├── cuisine_check.py              # extra cuisine-label check, tables and heatmap (not used in the report)
 │   ├── fig_mesures.py                # centrality and degree figures (extra)
 │   ├── interactive.py                # interactive explorer, HTML (extra)
 │   └── interactive_template.html     # page template used by interactive.py
