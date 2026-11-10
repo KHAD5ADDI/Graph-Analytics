@@ -23,7 +23,7 @@
 
 Group project, Graph Analytics course, Albert School, 2026
 
-**[Results](#results) · [Architecture](#technical-architecture) · [Limitations](#limitations-and-residual-risks)**
+**[Slides](https://khad5addi.github.io/Graph-Analytics/) · [Results](#results) · [Architecture](#technical-architecture) · [Limitations](#limitations-and-residual-risks)**
 
 </div>
 
@@ -378,6 +378,7 @@ Removal experiments (repository only)
 │   ├── fig_mesures.py                # centrality and degree figures (extra)
 │   ├── interactive.py                # interactive explorer, HTML (extra)
 │   └── interactive_template.html     # page template used by interactive.py
+├── slides/                           # oral presentation (Slidev), published to GitHub Pages
 └── outputs/
     ├── ingredients_nodes.csv         # node table (degree, strength, betweenness, community, ...)
     ├── countries_nodes.csv
@@ -421,6 +422,8 @@ Prerequisites: [uv](https://docs.astral.sh/uv/getting-started/installation/). uv
    ```
 
    `analyze.py` takes about 2 minutes (the sensitivity analysis rebuilds the graph for each threshold). On Windows, set `PYTHONIOENCODING=utf-8` if the console fails on accented country names. `seed_stability.py` and `pmi_justification.py` each take under a minute; `fig_mesures.py` and `interactive.py` are optional extras (see [section 7](#7-extra-analyses-and-visualisations)).
+
+4. Optional, the slides of the oral (Node.js 22 or later): `cd slides && npm install && npm run dev`, then open http://localhost:3030. The published version is at https://khad5addi.github.io/Graph-Analytics/ (arrow keys to move).
 
 ## Data sources and versions
 

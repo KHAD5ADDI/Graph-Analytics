@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.slidev/
+script.md
+.DS_Store

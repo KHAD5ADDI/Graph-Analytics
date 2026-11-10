@@ -1,0 +1,22 @@
+{
+  "name": "graph-analytics-slides",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "slidev --port 3030 --open",
+    "present": "slidev --port 3030 --remote",
+    "build": "slidev build",
+    "export": "slidev export",
+    "build:pages": "slidev build --base /Graph-Analytics/ --out dist && cp dist/index.html dist/404.html"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource/instrument-serif": "5.3.0",
+    "@slidev/cli": "53.0.0",
+    "@slidev/theme-default": "0.25.0",
+    "gsap": "3.15.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
